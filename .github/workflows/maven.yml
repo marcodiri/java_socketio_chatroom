@@ -1,0 +1,29 @@
+name: Java CI Test Ubuntu
+
+on:
+  push:
+  pull_request:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    name: Build on ubuntu
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 8
+
+    - name: Cache Maven
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
+        restore-keys: ${{ runner.os }}-m2-
+
+    - name: Build with Maven
+      run: mvn verify
+      working-directory: java_socketio_chatroom_server
