@@ -7,6 +7,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      # test against several Java versions:
+      matrix:
+        include:
+          - additional-maven-args: >
+              -Pjacoco
+              -DrepoToken=$COVERALLS_REPO_TOKEN
+              -DpullRequest=${{ github.event.pull_request.number }}
+              coveralls:report
 
     name: Build on ubuntu
     steps:
@@ -25,5 +34,7 @@ jobs:
         restore-keys: ${{ runner.os }}-m2-
 
     - name: Build with Maven
-      run: mvn verify
+      run: mvn verify ${{ matrix.additional-maven-args }}
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       working-directory: java_socketio_chatroom_server

@@ -21,6 +21,7 @@
 		<log4j.version>2.14.1</log4j.version>
 		<jacoco.plugin.version>0.8.7</jacoco.plugin.version>
 		<pitest.plugin.version>1.6.6</pitest.plugin.version>
+		<coveralls.plugin.version>4.3.0</coveralls.plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -154,6 +155,11 @@
 						</mutators>
 						<mutationThreshold>100</mutationThreshold>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eluder.coveralls</groupId>
+					<artifactId>coveralls-maven-plugin</artifactId>
+					<version>${coveralls.plugin.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
