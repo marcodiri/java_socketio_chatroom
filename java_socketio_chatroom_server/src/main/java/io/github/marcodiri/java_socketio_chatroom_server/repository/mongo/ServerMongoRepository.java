@@ -27,7 +27,7 @@ public class ServerMongoRepository implements ServerRepository {
 	public List<Message> findAll() {
 		return StreamSupport.
 				stream(msgCollection.find().spliterator(), false)
-				.map(this::fromDocumentToStudent)
+				.map(this::fromDocumentToMessage)
 				.collect(Collectors.toList());
 	}
 
@@ -40,7 +40,7 @@ public class ServerMongoRepository implements ServerRepository {
 				.append("message", message.getMessage()));
 	}
 
-	private Message fromDocumentToStudent(Document d) {
+	private Message fromDocumentToMessage(Document d) {
 		return new Message(
 				new Timestamp(Long.parseLong(d.get("timestamp").toString())), 
 				""+d.get("user"), 
