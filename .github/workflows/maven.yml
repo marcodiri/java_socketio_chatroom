@@ -13,6 +13,7 @@ jobs:
         include:
           - additional-maven-args: >
               -Pjacoco
+              -Pmutation-testing
               -DrepoToken=$COVERALLS_REPO_TOKEN
               -DpullRequest=${{ github.event.pull_request.number }}
               coveralls:report
