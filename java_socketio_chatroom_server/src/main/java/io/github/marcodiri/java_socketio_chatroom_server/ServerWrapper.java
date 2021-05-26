@@ -78,4 +78,8 @@ public class ServerWrapper {
     public void startServer() throws Exception {
         mServer.start();
     }
+
+    public void stopServer() throws Exception {
+        mServer.stop();
+    }
 }

@@ -27,4 +27,15 @@ public class ServerWrapperTest {
         assertThat(serverWrapper.getStatus()).isEqualTo("STARTED");
     }
 
+    @Test
+    public void testStopServerWhenServerIsRunning() {
+        try {
+            serverWrapper.startServer();
+            serverWrapper.stopServer();
+        } catch (Exception ignored) {
+
+        }
+        assertThat(serverWrapper.getStatus()).isEqualTo("STOPPED");
+    }
+
 }
