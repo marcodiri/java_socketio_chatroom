@@ -1,38 +1,30 @@
 package io.github.marcodiri.java_socketio_chatroom_server;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.assertj.core.api.Assertions.*;
 
-/**
- * Unit test for simple App.
- */
-public class ServerWrapperTest
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public ServerWrapperTest(String testName )
-    {
-        super( testName );
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+
+import static org.junit.Assert.*;
+
+public class ServerWrapperTest {
+    private ServerWrapper serverWrapper;
+
+    @Before
+    public void setup() {
+        serverWrapper = new ServerWrapper();
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( ServerWrapperTest.class );
+
+    @Test
+    public void testStartServer() {
+        try {
+            serverWrapper.startServer();
+        } catch (Exception ignored) {
+
+        }
+        assertThat(serverWrapper.getStatus()).isEqualTo("STARTED");
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
 }

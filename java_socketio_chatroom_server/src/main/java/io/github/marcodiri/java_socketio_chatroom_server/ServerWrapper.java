@@ -29,7 +29,7 @@ public class ServerWrapper {
     private final EngineIoServer mEngineIoServer;
     private final SocketIoServer mSocketIoServer;
 
-    ServerWrapper() {
+    public ServerWrapper() {
 
         mServer = new Server(PORT_START.getAndIncrement());
         mEngineIoServer = new EngineIoServer();
@@ -59,7 +59,7 @@ public class ServerWrapper {
                     new ServletPathSpec("/socket.io/*"),
                     (servletUpgradeRequest, servletUpgradeResponse) -> new JettyWebSocketHandler(mEngineIoServer));
         } catch (ServletException ex) {
-            ex.printStackTrace();
+            // TODO add log here
         }
 
         HandlerList handlerList = new HandlerList();
@@ -67,11 +67,15 @@ public class ServerWrapper {
         mServer.setHandler(handlerList);
     }
 
-    String getStatus() {
+    public String getStatus() {
         return mServer.getState();
     }
 
-    SocketIoServer getSocketIoServer() {
+    public SocketIoServer getSocketIoServer() {
         return mSocketIoServer;
+    }
+
+    public void startServer() throws Exception {
+        mServer.start();
     }
 }
