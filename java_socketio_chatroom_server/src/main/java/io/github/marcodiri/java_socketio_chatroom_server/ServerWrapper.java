@@ -29,7 +29,7 @@ public class ServerWrapper {
     private final EngineIoServer mEngineIoServer;
     private final SocketIoServer mSocketIoServer;
 
-    public ServerWrapper() {
+    ServerWrapper() {
 
         mServer = new Server(PORT_START.getAndIncrement());
         mEngineIoServer = new EngineIoServer();
@@ -67,19 +67,19 @@ public class ServerWrapper {
         mServer.setHandler(handlerList);
     }
 
-    public String getStatus() {
+    String getStatus() {
         return mServer.getState();
     }
 
-    public SocketIoServer getSocketIoServer() {
+    SocketIoServer getSocketIoServer() {
         return mSocketIoServer;
     }
 
-    public void startServer() throws Exception {
+    void startServer() throws Exception {
         mServer.start();
     }
 
-    public void stopServer() throws Exception {
+    void stopServer() throws Exception {
         mServer.stop();
     }
 }

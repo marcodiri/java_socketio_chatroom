@@ -2,11 +2,9 @@ package io.github.marcodiri.java_socketio_chatroom_server;
 
 import static org.assertj.core.api.Assertions.*;
 
-import org.junit.After;
 import org.junit.Test;
 import org.junit.Before;
 
-import static org.junit.Assert.*;
 
 public class ServerWrapperTest {
     private ServerWrapper serverWrapper;
