@@ -4,9 +4,12 @@ import static io.github.marcodiri.java_socketio_chatroom_server.repository.mongo
 import static io.github.marcodiri.java_socketio_chatroom_server.repository.mongo.ServerMongoRepository.MESSAGES_COLLECTION_NAME;
 
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,5 +59,21 @@ public class ServerMongoRepositoryIT {
 					new Message(ts1, "user1", "message1"),
 					new Message(ts2, "user2", "message2")
 					);
+	}
+	
+	@Test
+	public void testSave() {
+		Message msg = new Message(new Timestamp(System.currentTimeMillis()), "user", "message");
+		serverRepository.save(msg);
+		assertThat(readAllMessages()).containsExactly(msg);
+	}
+	
+	private List<Message> readAllMessages() {
+		return StreamSupport.stream(messagesCollection.find().spliterator(), false)
+				.map(d -> new Message(
+						new Timestamp(Long.parseLong(d.get("timestamp").toString())), 
+						"" + d.get("user"),
+						"" + d.get("message")))
+				.collect(Collectors.toList());
 	}
 }

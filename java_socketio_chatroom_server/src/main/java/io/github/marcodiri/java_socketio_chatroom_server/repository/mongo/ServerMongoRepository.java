@@ -33,8 +33,11 @@ public class ServerMongoRepository implements ServerRepository {
 
 	@Override
 	public void save(Message message) {
-		// TODO Auto-generated method stub
-
+		msgCollection.insertOne(
+				new Document()
+				.append("timestamp", message.getTimestamp().getTime())
+				.append("user", message.getUser())
+				.append("message", message.getMessage()));
 	}
 
 	private Message fromDocumentToStudent(Document d) {
