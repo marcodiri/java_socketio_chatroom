@@ -37,7 +37,7 @@ public class ServerMongoRepository implements ServerRepository {
 				new Document()
 				.append("timestamp", message.getTimestamp().getTime())
 				.append("user", message.getUser())
-				.append("message", message.getMessage()));
+				.append("message", message.getUserMessage()));
 	}
 
 	private Message fromDocumentToMessage(Document d) {

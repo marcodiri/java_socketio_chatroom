@@ -6,12 +6,12 @@ import java.util.Objects;
 public final class Message {
 	private final Timestamp timestamp;
 	private final String user;
-	private final String message;
+	private final String userMessage;
 	
 	public Message(Timestamp timestamp, String user, String message) {
 		this.timestamp = new Timestamp(timestamp.getTime());
 		this.user = user;
-		this.message = message;
+		this.userMessage = message;
 	}
 
 	public Timestamp getTimestamp() {
@@ -22,16 +22,16 @@ public final class Message {
 		return user;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getUserMessage() {
+		return userMessage;
 	}
 	
 	@Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Message{");
+        final StringBuilder sb = new StringBuilder("Message{");
         sb.append("timestamp=").append(timestamp);
         sb.append(", user=").append(user);
-        sb.append(", message=").append(message);
+        sb.append(", message=").append(userMessage);
         sb.append('}');
         return sb.toString();
     }
@@ -43,11 +43,11 @@ public final class Message {
         if (o == null || getClass() != o.getClass())
             return false;
         Message msg = (Message) o;
-        return Objects.equals(timestamp, msg.timestamp) && Objects.equals(user, msg.user) && Objects.equals(message, msg.message);
+        return Objects.equals(timestamp, msg.timestamp) && Objects.equals(user, msg.user) && Objects.equals(userMessage, msg.userMessage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(timestamp, user, message);
+        return Objects.hash(timestamp, user, userMessage);
     }
 }
