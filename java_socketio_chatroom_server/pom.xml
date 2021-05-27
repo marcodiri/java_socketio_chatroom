@@ -22,7 +22,7 @@
 		<jacoco.plugin.version>0.8.7</jacoco.plugin.version>
 		<pitest.plugin.version>1.6.6</pitest.plugin.version>
 		<coveralls.plugin.version>4.3.0</coveralls.plugin.version>
-
+		<mongo.driver.version>3.12.8</mongo.driver.version>
 		<javax.version>4.0.1</javax.version>
 		<jetty-server.version>9.4.41.v20210516</jetty-server.version>
 		<jetty-servlet.version>9.4.41.v20210516</jetty-servlet.version>
@@ -58,6 +58,11 @@
 				<version>${log4j.version}</version>
 				<scope>import</scope>
 				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongo-java-driver</artifactId>
+				<version>${mongo.driver.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -119,6 +124,10 @@
 			<artifactId>log4j-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
@@ -169,6 +178,18 @@
 					<version>2.22.1</version>
 				</plugin>
 				<plugin>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.22.2</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>3.0.2</version>
 				</plugin>
@@ -211,9 +232,59 @@
 					</executions>
 				</plugin>
 				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.2.0</version>
+					<executions>
+						<execution>
+							<id>add-test-source</id>
+							<phase>generate-test-sources</phase>
+							<goals>
+								<goal>add-test-source</goal>
+							</goals>
+							<configuration>
+								<sources>
+									<source>src/it/java</source>
+								</sources>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>${jacoco.plugin.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<!-- binds by default to the phase "initialize" -->
+								<goal>prepare-agent</goal>
+								<!-- binds by default to the phase "verify" -->
+								<goal>report</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>jacoco-check</id>
+							<goals>
+								<!-- binds by default to the phase "verify" -->
+								<goal>check</goal>
+							</goals>
+							<configuration>
+								<rules>
+									<rule>
+										<element>PACKAGE</element>
+										<limits>
+											<limit>
+												<counter>LINE</counter>
+												<value>COVEREDRATIO</value>
+												<minimum>1</minimum>
+											</limit>
+										</limits>
+									</rule>
+								</rules>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.pitest</groupId>
@@ -232,6 +303,11 @@
 					<artifactId>coveralls-maven-plugin</artifactId>
 					<version>${coveralls.plugin.version}</version>
 				</plugin>
+				<plugin>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.36.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -240,18 +316,44 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>**/ServerWrapper.*</exclude>
-						<exclude>**/ServerWrapper$*.*</exclude>
-					</excludes>
-				</configuration>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<!-- FIXME: pitest plugin is not able to connect to db when property 
+					is set -->
+				<!-- <configuration> <systemPropertyVariables> <mongo.port>${mongo.mapped.port}</mongo.port> 
+					</systemPropertyVariables> </configuration> -->
 			</plugin>
 			<plugin>
-				<groupId>org.pitest</groupId>
-				<artifactId>pitest-maven</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<configuration>
+					<images>
+						<image>
+							<name>mongo:4.2.14</name>
+							<run>
+								<ports>
+									<!-- FIXME: should be <port>mongo.mapped.port:27017</port> -->
+									<port>27017:27017</port>
+								</ports>
+							</run>
+						</image>
+					</images>
+				</configuration>
+				<executions>
+					<execution>
+						<id>docker-start</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>docker-stop</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -274,14 +376,20 @@
 						<!-- configured in pluginManagement -->
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>prepare-agent</goal>
-									<goal>report</goal>
-								</goals>
-							</execution>
-						</executions>
+						<configuration>
+							<excludes>
+								<exclude>**/Message.*</exclude>
+								<exclude>**/ServerWrapper.*</exclude>
+								<exclude>**/ServerWrapper$*.*</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<artifactId>maven-failsafe-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
@@ -294,9 +402,17 @@
 						<!-- configured also in pluginManagement -->
 						<groupId>org.pitest</groupId>
 						<artifactId>pitest-maven</artifactId>
+						<configuration>
+							<excludedClasses>
+								<param>io.github.marcodiri.java_socketio_chatroom_server.model.*</param>
+							</excludedClasses>
+							<targetTests>
+								<param>io.github.marcodiri.java_socketio_chatroom_server.*</param>
+							</targetTests>
+						</configuration>
 						<executions>
 							<execution>
-								<phase>verify</phase>
+								<phase>integration-test</phase>
 								<goals>
 									<goal>mutationCoverage</goal>
 								</goals>
