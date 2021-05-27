@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.socket.engineio.server.EngineIoServer;
 import io.socket.engineio.server.JettyWebSocketHandler;
@@ -23,15 +22,13 @@ import io.socket.socketio.server.SocketIoServer;
 
 public class ServerWrapper {
 
-    private static final AtomicInteger PORT_START = new AtomicInteger(3000);
-
     private final Server mServer;
     private final EngineIoServer mEngineIoServer;
     private final SocketIoServer mSocketIoServer;
 
     ServerWrapper() {
 
-        mServer = new Server(PORT_START.getAndIncrement());
+        mServer = new Server(3000);
         mEngineIoServer = new EngineIoServer();
         mSocketIoServer = new SocketIoServer(mEngineIoServer);
 
@@ -44,12 +41,7 @@ public class ServerWrapper {
         servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
             @Override
             protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
-                mEngineIoServer.handleRequest(new HttpServletRequestWrapper(request) {
-                    @Override
-                    public boolean isAsyncSupported() {
-                        return false;
-                    }
-                }, response);
+                mEngineIoServer.handleRequest(new HttpServletRequestWrapper(request), response);
             }
         }), "/socket.io/*");
 
