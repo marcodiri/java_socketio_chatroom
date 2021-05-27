@@ -24,12 +24,8 @@ public class ServerWrapperTest {
     }
 
     @After
-    public void alwaysStopServer() {
-        try {
-            serverWrapper.stopServer();
-        } catch (Exception ignored) {
-
-        }
+    public void alwaysStopServer() throws Exception {
+        serverWrapper.stopServer();
     }
 
 
@@ -38,7 +34,7 @@ public class ServerWrapperTest {
         try {
             serverWrapper.startServer();
         } catch (Exception ignored) {
-
+            fail("Jetty server startup failed");
         }
         assertThat(serverWrapper.getStatus()).isEqualTo("STARTED");
     }
@@ -49,7 +45,7 @@ public class ServerWrapperTest {
             serverWrapper.startServer();
             serverWrapper.stopServer();
         } catch (Exception ignored) {
-
+            fail("Jetty server startup failed");
         }
         assertThat(serverWrapper.getStatus()).isEqualTo("STOPPED");
     }
@@ -59,7 +55,7 @@ public class ServerWrapperTest {
         try {
             serverWrapper.startServer();
         } catch (Exception ignored) {
-
+            fail("Jetty server startup failed");
         }
         SocketIoNamespace namespace = serverWrapper.getSocketIoServer().namespace("/");
         namespace.on("test", args -> {
@@ -74,12 +70,10 @@ public class ServerWrapperTest {
         try {
             serverWrapper.startServer();
         } catch (Exception ignored) {
-
+            fail("Jetty server startup failed");
         }
         SocketIoNamespace namespace = serverWrapper.getSocketIoServer().namespace("/");
-        namespace.on("connection", args -> {
-            connected.set(true);
-        });
+        namespace.on("connection", args -> connected.set(true));
 
         Socket socket = IO.socket(URI.create("http://localhost:3000"), IO.Options.builder().build());
 
