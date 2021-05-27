@@ -51,7 +51,6 @@ public class ServerWrapper {
                     new ServletPathSpec("/socket.io/*"),
                     (servletUpgradeRequest, servletUpgradeResponse) -> new JettyWebSocketHandler(mEngineIoServer));
         } catch (ServletException ex) {
-            // TODO add log here
         }
 
         HandlerList handlerList = new HandlerList();
