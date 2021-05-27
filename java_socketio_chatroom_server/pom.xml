@@ -30,6 +30,17 @@
 		<socketIO.version>3.0.1</socketIO.version>
 		<engineIO.version>5.0.0</engineIO.version>
 		<engineIO-jetty.version>5.0.0</engineIO-jetty.version>
+
+		<sonar.coverage.exclusions>
+			**/model/*.*,
+			**/ServerWrapper.*,
+			**/ServerWrapper$*.*
+		</sonar.coverage.exclusions>
+
+		<sonar.junit.reportPaths>
+			${project.build.directory}/surefire-reports,
+			${project.build.directory}/failsafe-reports
+		</sonar.junit.reportPaths>
 	</properties>
 
 	<dependencyManagement>
@@ -378,7 +389,7 @@
 						<artifactId>jacoco-maven-plugin</artifactId>
 						<configuration>
 							<excludes>
-								<exclude>**/Message.*</exclude>
+								<exclude>**/model/*.*</exclude>
 								<exclude>**/ServerWrapper.*</exclude>
 								<exclude>**/ServerWrapper$*.*</exclude>
 							</excludes>
