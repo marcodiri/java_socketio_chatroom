@@ -1,6 +1,8 @@
 package io.github.marcodiri.java_socketio_chatroom_server;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.*;
+import static org.awaitility.Awaitility.await;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -67,7 +69,7 @@ public class ServerWrapperTest {
     }
 
     @Test
-    public void testServerCanHandleRequest() throws InterruptedException {
+    public void testServerCanHandleRequest() {
         AtomicBoolean connected = new AtomicBoolean(false);
         try {
             serverWrapper.startServer();
@@ -82,10 +84,9 @@ public class ServerWrapperTest {
         Socket socket = IO.socket(URI.create("http://localhost:3000"), IO.Options.builder().build());
 
         socket.connect();
-        Thread.sleep(1000);
+        await().atMost(2, SECONDS).untilTrue(connected);
         socket.disconnect();
 
-        assertThat(connected.get()).isTrue();
     }
 
 

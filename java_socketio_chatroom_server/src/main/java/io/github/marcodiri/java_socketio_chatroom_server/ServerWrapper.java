@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.socket.engineio.server.EngineIoServer;
 import io.socket.engineio.server.JettyWebSocketHandler;
