@@ -378,7 +378,7 @@
 						<artifactId>jacoco-maven-plugin</artifactId>
 						<configuration>
 							<excludes>
-								<exclude>**/model/*</exclude>
+								<exclude>**/Message.*</exclude>
 								<exclude>**/ServerWrapper.*</exclude>
 								<exclude>**/ServerWrapper$*.*</exclude>
 							</excludes>
