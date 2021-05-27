@@ -317,11 +317,10 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<configuration>
-					<systemPropertyVariables>
-						<mongo.port>${mongo.mapped.port}</mongo.port>
-					</systemPropertyVariables>
-				</configuration>
+				<!-- FIXME: pitest plugin is not able to connect to db when property 
+					is set -->
+				<!-- <configuration> <systemPropertyVariables> <mongo.port>${mongo.mapped.port}</mongo.port> 
+					</systemPropertyVariables> </configuration> -->
 			</plugin>
 			<plugin>
 				<groupId>io.fabric8</groupId>
@@ -332,7 +331,8 @@
 							<name>mongo:4.2.14</name>
 							<run>
 								<ports>
-									<port>mongo.mapped.port:27017</port>
+									<!-- FIXME: should be <port>mongo.mapped.port:27017</port> -->
+									<port>27017:27017</port>
 								</ports>
 							</run>
 						</image>
@@ -412,7 +412,7 @@
 						</configuration>
 						<executions>
 							<execution>
-								<phase>verify</phase>
+								<phase>integration-test</phase>
 								<goals>
 									<goal>mutationCoverage</goal>
 								</goals>
