@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ChatroomServer {
 
-    private final String chatroomName = "Chatroom";
+    private static final String CHATROOM_NAME = "Chatroom";
 
     private final ServerWrapper serverWrapper;
 
@@ -45,7 +45,7 @@ public class ChatroomServer {
 
     private void handleClientJoin(SocketIoSocket socket) {
         socket.on("join", arg -> {
-            socket.joinRoom(chatroomName);
+            socket.joinRoom(CHATROOM_NAME);
             List<Message> history = repository.findAll();
             for (Message message : history) {
                 socket.send("msg", message.toJSON());
@@ -55,7 +55,7 @@ public class ChatroomServer {
 
     private void handleClientMessage(SocketIoSocket socket, SocketIoNamespace namespace) {
         socket.on("msg", arg -> {
-            namespace.broadcast(chatroomName, "msg", arg[0]);
+            namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
             JSONObject jsonMsg = (JSONObject) arg[0];
             Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             repository.save(incomingMessage);
@@ -63,7 +63,7 @@ public class ChatroomServer {
     }
 
     private void handleClientLeave(SocketIoSocket socket) {
-        socket.on("leave", arg -> socket.leaveRoom(chatroomName));
+        socket.on("leave", arg -> socket.leaveRoom(CHATROOM_NAME));
     }
 
     SocketIoNamespace getNamespace() {
