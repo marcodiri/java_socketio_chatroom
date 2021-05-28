@@ -15,7 +15,7 @@ import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerReposi
 public class ServerMongoRepository implements ServerRepository {
 	public static final String CHATROOM_DB_NAME = "chatroom";
 	public static final String MESSAGES_COLLECTION_NAME = "messages";
-	private MongoCollection<Document> msgCollection;
+	private final MongoCollection<Document> msgCollection;
 
 	public ServerMongoRepository(MongoClient client) {
 		msgCollection = client

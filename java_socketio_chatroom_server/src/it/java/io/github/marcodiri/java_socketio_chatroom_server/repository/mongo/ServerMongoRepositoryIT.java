@@ -22,16 +22,15 @@ import com.mongodb.client.MongoDatabase;
 import io.github.marcodiri.java_socketio_chatroom_server.model.Message;
 
 public class ServerMongoRepositoryIT {
-	private static int mongoPort = Integer.parseInt(System.getProperty("mongo.port", "27017"));
-	private MongoClient client;
+	private static final int mongoPort = Integer.parseInt(System.getProperty("mongo.port", "27017"));
 	private ServerMongoRepository serverRepository;
 	private MongoCollection<Document> messagesCollection;
 
 	@Before
 	public void setup() {
-		client = new MongoClient(
+		MongoClient client = new MongoClient(
 				new ServerAddress("localhost", mongoPort)
-				);
+		);
 		serverRepository = new ServerMongoRepository(client);
 		MongoDatabase database = client.getDatabase(CHATROOM_DB_NAME);
 		database.drop();
