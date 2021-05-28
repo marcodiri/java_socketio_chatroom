@@ -80,8 +80,11 @@ public class ChatroomServerIT {
         clientSocket.connect();
         clientSocket.emit("join");
 
-
-        await().atMost(2, SECONDS).until(() -> retrievedMessages.containsAll(asList(msg1, msg2)));
+        try {
+            await().atMost(2, SECONDS).until(() -> retrievedMessages.containsAll(asList(msg1, msg2)));
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected " + asList(msg1, msg2) + " but got " + retrievedMessages);
+        }
         verify(serverRepository, times(1)).findAll();
     }
 
@@ -103,7 +106,11 @@ public class ChatroomServerIT {
         clientSocket.emit("msg", originalMessage1.toJSON());
         clientSocket.emit("msg", originalMessage2.toJSON());
 
-        await().atMost(2, SECONDS).until(() -> retrievedMessages.containsAll(asList(originalMessage1, originalMessage2)));
+        try {
+            await().atMost(2, SECONDS).until(() -> retrievedMessages.containsAll(asList(originalMessage1, originalMessage2)));
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected " + asList(originalMessage1, originalMessage2) + " but got " + retrievedMessages);
+        }
     }
 
     @Test
@@ -125,7 +132,11 @@ public class ChatroomServerIT {
         clientSocket.emit("msg", originalMessage2.toJSON());
 
         ArgumentCaptor<Message> argumentCaptor = ArgumentCaptor.forClass(Message.class);
-        await().atMost(2, SECONDS).until(() -> !retrievedMessages.isEmpty());
+        try {
+            await().atMost(2, SECONDS).until(() -> !retrievedMessages.isEmpty());
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected " + asList(originalMessage1, originalMessage2) + " but got empty list");
+        }
         verify(serverRepository, times(2)).save(argumentCaptor.capture());
         List<Message> capturedArgument = argumentCaptor.getAllValues();
 
@@ -136,9 +147,17 @@ public class ChatroomServerIT {
     public void testRoomSizeWhenClientJoinsAndWhenLeaves() {
         clientSocket.connect();
         clientSocket.emit("join");
-        await().atMost(2, SECONDS).until(() -> chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length == 1);
+        try {
+            await().atMost(2, SECONDS).until(() -> chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length == 1);
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected 1 but got " + chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length);
+        }
         clientSocket.emit("leave");
-        await().atMost(2, SECONDS).until(() -> chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length == 0);
+        try {
+            await().atMost(2, SECONDS).until(() -> chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length == 0);
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected 0 but got " + chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length);
+        }
 
     }
 }

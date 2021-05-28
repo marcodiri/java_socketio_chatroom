@@ -78,7 +78,11 @@ public class ServerWrapperTest {
         Socket socket = IO.socket(URI.create("http://localhost:3000"), IO.Options.builder().build());
 
         socket.connect();
-        await().atMost(2, SECONDS).untilTrue(connected);
+        try {
+            await().atMost(2, SECONDS).untilTrue(connected);
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected true but got " + connected.get());
+        }
         socket.disconnect();
 
     }
