@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ChatroomServer {
 
-    private final String chatroomName = "chatroom";
+    private final String chatroomName = "Chatroom";
 
     private final ServerWrapper serverWrapper;
 
