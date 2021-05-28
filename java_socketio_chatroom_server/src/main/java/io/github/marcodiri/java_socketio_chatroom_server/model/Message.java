@@ -1,5 +1,7 @@
 package io.github.marcodiri.java_socketio_chatroom_server.model;
 
+import org.json.JSONObject;
+
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -25,6 +27,16 @@ public final class Message {
 	public String getUserMessage() {
 		return userMessage;
 	}
+
+	public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+
+        obj.put("timestamp", timestamp.getTime());
+        obj.put("user", user);
+        obj.put("message", userMessage);
+
+        return obj;
+    }
 	
 	@Override
     public String toString() {
