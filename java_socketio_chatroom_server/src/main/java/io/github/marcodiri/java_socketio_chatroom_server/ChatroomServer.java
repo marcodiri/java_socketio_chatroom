@@ -5,14 +5,14 @@ import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerReposi
 
 import io.socket.socketio.server.SocketIoNamespace;
 import io.socket.socketio.server.SocketIoSocket;
-import org.eclipse.jetty.util.ajax.JSON;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.List;
 
 public class ChatroomServer {
+
+    private final String chatroomName = "chatroom";
 
     private final ServerWrapper serverWrapper;
 
@@ -45,7 +45,7 @@ public class ChatroomServer {
 
     private void handleClientJoin(SocketIoSocket socket) {
         socket.on("join", arg -> {
-            socket.joinRoom("Chatroom");
+            socket.joinRoom(chatroomName);
             List<Message> history = repository.findAll();
             for (Message message : history) {
                 socket.send("msg", message.toJSON());
@@ -55,7 +55,7 @@ public class ChatroomServer {
 
     private void handleClientMessage(SocketIoSocket socket, SocketIoNamespace namespace) {
         socket.on("msg", arg -> {
-            namespace.broadcast("Chatroom", "msg", arg[0]);
+            namespace.broadcast(chatroomName, "msg", arg[0]);
             JSONObject jsonMsg = (JSONObject) arg[0];
             Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             repository.save(incomingMessage);
@@ -63,7 +63,7 @@ public class ChatroomServer {
     }
 
     private void handleClientLeave(SocketIoSocket socket) {
-        socket.on("leave", arg -> socket.leaveRoom("Chatroom"));
+        socket.on("leave", arg -> socket.leaveRoom(chatroomName));
     }
 
     SocketIoNamespace getNamespace() {
