@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.junit.*;
 import org.mockito.*;
 
+import static java.util.Arrays.asList;
 import static org.mockito.Mockito.*;
 
 import java.net.URI;
@@ -80,7 +81,7 @@ public class ChatroomServerIT {
         clientSocket.emit("join");
 
 
-        await().atMost(2, SECONDS).until(() -> retrievedMessages.contains(msg1) && retrievedMessages.contains(msg2));
+        await().atMost(2, SECONDS).until(() -> retrievedMessages.containsAll(asList(msg1, msg2)));
         verify(serverRepository, times(1)).findAll();
     }
 
@@ -102,7 +103,7 @@ public class ChatroomServerIT {
         clientSocket.emit("msg", originalMessage1.toJSON());
         clientSocket.emit("msg", originalMessage2.toJSON());
 
-        await().atMost(2, SECONDS).until(() -> retrievedMessages.contains(originalMessage1) && retrievedMessages.contains(originalMessage2));
+        await().atMost(2, SECONDS).until(() -> retrievedMessages.containsAll(asList(originalMessage1, originalMessage2)));
     }
 
     @Test
@@ -128,7 +129,7 @@ public class ChatroomServerIT {
         verify(serverRepository, times(2)).save(argumentCaptor.capture());
         List<Message> capturedArgument = argumentCaptor.getAllValues();
 
-        assertThat(capturedArgument.contains(originalMessage1) && capturedArgument.contains(originalMessage2)).isTrue();
+        assertThat(capturedArgument).contains(originalMessage1, originalMessage2);
     }
 
     @Test
