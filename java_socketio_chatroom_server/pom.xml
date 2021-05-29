@@ -35,7 +35,8 @@
 		<sonar.coverage.exclusions>
 			**/model/*.*,
 			**/ServerWrapper.*,
-			**/ServerWrapper$*.*
+			**/ServerWrapper$*.*,
+			**/App.*
 		</sonar.coverage.exclusions>
 
 		<sonar.junit.reportPaths>
@@ -398,6 +399,7 @@
 								<exclude>**/model/*.*</exclude>
 								<exclude>**/ServerWrapper.*</exclude>
 								<exclude>**/ServerWrapper$*.*</exclude>
+								<exclude>**/App.*</exclude>
 							</excludes>
 						</configuration>
 					</plugin>
@@ -422,6 +424,7 @@
 						<configuration>
 							<excludedClasses>
 								<param>io.github.marcodiri.java_socketio_chatroom_server.model.*</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_server.App</param>
 							</excludedClasses>
 							<targetTests>
 								<param>io.github.marcodiri.java_socketio_chatroom_server.*</param>
