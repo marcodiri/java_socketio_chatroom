@@ -246,7 +246,7 @@
 								</descriptorRefs>
 								<archive>
 									<manifest>
-										<mainClass>org.example.Main</mainClass>
+										<mainClass>io.github.marcodiri.java_socketio_chatroom_server.App</mainClass>
 									</manifest>
 								</archive>
 							</configuration>
