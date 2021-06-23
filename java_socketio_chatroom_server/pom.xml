@@ -29,8 +29,8 @@
 		<jetty-servlet.version>9.4.41.v20210516</jetty-servlet.version>
 		<jetty-websocket.version>9.4.41.v20210516</jetty-websocket.version>
 		<socketIO.version>3.0.1</socketIO.version>
-		<engineIO.version>4.0.2</engineIO.version>
-		<engineIO-jetty.version>4.0.2</engineIO-jetty.version>
+		<engineIO.version>4.0.3</engineIO.version>
+		<engineIO-jetty.version>4.0.3</engineIO-jetty.version>
 
 		<sonar.coverage.exclusions>
 			**/model/*.*,
