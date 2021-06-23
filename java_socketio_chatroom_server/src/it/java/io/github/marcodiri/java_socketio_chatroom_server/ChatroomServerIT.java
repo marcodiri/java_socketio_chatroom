@@ -77,8 +77,8 @@ public class ChatroomServerIT {
             Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             retrievedMessages.add(incomingMessage);
         });
+        clientSocket.on(Socket.EVENT_CONNECT, objects -> clientSocket.emit("join"));
         clientSocket.connect();
-        clientSocket.emit("join");
 
         try {
             await().atMost(2, SECONDS).until(() -> retrievedMessages.containsAll(asList(msg1, msg2)));
@@ -101,10 +101,12 @@ public class ChatroomServerIT {
             Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             retrievedMessages.add(incomingMessage);
         });
+        clientSocket.on(Socket.EVENT_CONNECT, objects -> {
+            clientSocket.emit("join");
+            clientSocket.emit("msg", originalMessage1.toJSON());
+            clientSocket.emit("msg", originalMessage2.toJSON());
+        });
         clientSocket.connect();
-        clientSocket.emit("join");
-        clientSocket.emit("msg", originalMessage1.toJSON());
-        clientSocket.emit("msg", originalMessage2.toJSON());
 
         try {
             await().atMost(2, SECONDS).until(() -> retrievedMessages.containsAll(asList(originalMessage1, originalMessage2)));
@@ -126,16 +128,18 @@ public class ChatroomServerIT {
             Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             retrievedMessages.add(incomingMessage);
         });
+        clientSocket.on(Socket.EVENT_CONNECT, objects -> {
+            clientSocket.emit("join");
+            clientSocket.emit("msg", originalMessage1.toJSON());
+            clientSocket.emit("msg", originalMessage2.toJSON());
+        });
         clientSocket.connect();
-        clientSocket.emit("join");
-        clientSocket.emit("msg", originalMessage1.toJSON());
-        clientSocket.emit("msg", originalMessage2.toJSON());
 
         ArgumentCaptor<Message> argumentCaptor = ArgumentCaptor.forClass(Message.class);
         try {
             await().atMost(2, SECONDS).until(() -> !retrievedMessages.isEmpty());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Expected " + asList(originalMessage1, originalMessage2) + " but got empty list");
+            fail("Expected " + asList(originalMessage1, originalMessage2) + " but got " + retrievedMessages);
         }
         verify(serverRepository, times(2)).save(argumentCaptor.capture());
         List<Message> capturedArgument = argumentCaptor.getAllValues();
@@ -145,8 +149,9 @@ public class ChatroomServerIT {
 
     @Test
     public void testRoomSizeWhenClientJoinsAndWhenLeaves() {
+        clientSocket.on(Socket.EVENT_CONNECT, objects -> clientSocket.emit("join"));
         clientSocket.connect();
-        clientSocket.emit("join");
+
         try {
             await().atMost(2, SECONDS).until(() -> chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length == 1);
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
