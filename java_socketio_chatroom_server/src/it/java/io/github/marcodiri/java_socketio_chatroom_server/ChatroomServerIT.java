@@ -27,21 +27,12 @@ public class ChatroomServerIT {
     private Socket clientSocket;
 
     @Mock
-    ServerRepository serverRepository;
+    private ServerRepository serverRepository;
 
     @InjectMocks
     private ChatroomServer chatroomServer;
 
     private AutoCloseable closeable;
-
-    @BeforeClass
-    public static void socketSetup() {
-
-    }
-
-    @AfterClass
-    public static void socketDisconnect() {
-    }
 
     @Before
     public void setup() {
