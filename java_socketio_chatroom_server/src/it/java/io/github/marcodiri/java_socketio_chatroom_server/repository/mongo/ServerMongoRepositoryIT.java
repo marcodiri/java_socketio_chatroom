@@ -11,8 +11,7 @@ import java.util.stream.StreamSupport;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.bson.Document;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
@@ -23,18 +22,30 @@ import io.github.marcodiri.java_socketio_chatroom_server.model.Message;
 
 public class ServerMongoRepositoryIT {
 	private static final int mongoPort = Integer.parseInt(System.getProperty("mongo.port", "27017"));
-	private ServerMongoRepository serverRepository;
-	private MongoCollection<Document> messagesCollection;
+	private static ServerMongoRepository serverRepository;
+	private static MongoCollection<Document> messagesCollection;
 
-	@Before
-	public void setup() {
-		MongoClient client = new MongoClient(
+	private static MongoClient client;
+
+
+	@BeforeClass
+	public static void setup() {
+		client = new MongoClient(
 				new ServerAddress("localhost", mongoPort)
 		);
 		serverRepository = new ServerMongoRepository(client);
 		MongoDatabase database = client.getDatabase(CHATROOM_DB_NAME);
-		database.drop();
 		messagesCollection = database.getCollection(MESSAGES_COLLECTION_NAME);
+	}
+
+	@AfterClass
+	public static void closeConnection() {
+		client.close();
+	}
+
+	@After
+	public void dropMongoDb() {
+		client.getDatabase(CHATROOM_DB_NAME).drop();
 	}
 
 	@Test
