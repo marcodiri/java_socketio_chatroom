@@ -425,6 +425,7 @@
 							<excludedClasses>
 								<param>io.github.marcodiri.java_socketio_chatroom_server.model.*</param>
 								<param>io.github.marcodiri.java_socketio_chatroom_server.App</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_server.ServerWrapper</param>
 								<param>io.github.marcodiri.java_socketio_chatroom_server.repository.mongo.ServerMongoRepository</param>
 							</excludedClasses>
 							<targetTests>

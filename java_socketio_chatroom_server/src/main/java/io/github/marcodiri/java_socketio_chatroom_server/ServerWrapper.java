@@ -58,10 +58,6 @@ public class ServerWrapper {
         mServer.setHandler(handlerList);
     }
 
-    String getStatus() {
-        return mServer.getState();
-    }
-
     SocketIoServer getSocketIoServer() {
         return mSocketIoServer;
     }
