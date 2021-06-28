@@ -425,14 +425,15 @@
 							<excludedClasses>
 								<param>io.github.marcodiri.java_socketio_chatroom_server.model.*</param>
 								<param>io.github.marcodiri.java_socketio_chatroom_server.App</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_server.repository.mongo.ServerMongoRepository</param>
 							</excludedClasses>
 							<targetTests>
-								<param>io.github.marcodiri.java_socketio_chatroom_server.*</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_server.*Test</param>
 							</targetTests>
 						</configuration>
 						<executions>
 							<execution>
-								<phase>integration-test</phase>
+								<phase>verify</phase>
 								<goals>
 									<goal>mutationCoverage</goal>
 								</goals>
