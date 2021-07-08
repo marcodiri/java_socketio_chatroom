@@ -20,6 +20,7 @@
 		<mockito.version>3.10.0</mockito.version>
 		<log4j.version>2.14.1</log4j.version>
 		<awaitility.version>4.1.0</awaitility.version>
+		<json.version>20210307</json.version>
 		<jacoco.plugin.version>0.8.7</jacoco.plugin.version>
 		<pitest.plugin.version>1.6.6</pitest.plugin.version>
 		<coveralls.plugin.version>4.3.0</coveralls.plugin.version>
@@ -63,6 +64,11 @@
 				<version>${awaitility.version}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>${json.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -90,6 +96,10 @@
 		<dependency>
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
 		</dependency>
 	</dependencies>
 
