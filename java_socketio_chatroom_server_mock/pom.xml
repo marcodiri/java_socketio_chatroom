@@ -20,6 +20,7 @@
 		<awaitility.version>4.1.0</awaitility.version>
 		<jacoco.plugin.version>0.8.7</jacoco.plugin.version>
 		<pitest.plugin.version>1.6.6</pitest.plugin.version>
+		<json.version>20210307</json.version>
 		<javax.version>4.0.1</javax.version>
 		<jetty-server.version>9.4.41.v20210516</jetty-server.version>
 		<jetty-servlet.version>9.4.41.v20210516</jetty-servlet.version>
@@ -48,6 +49,11 @@
 				<artifactId>awaitility</artifactId>
 				<version>${awaitility.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>${json.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -99,6 +105,10 @@
 		<dependency>
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

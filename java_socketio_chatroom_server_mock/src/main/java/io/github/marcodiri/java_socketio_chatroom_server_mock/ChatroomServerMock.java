@@ -59,7 +59,7 @@ public class ChatroomServerMock {
 		}
 	}
 
-	public void sendEvent(String event, String msg) throws NullPointerException {
+	public void sendEvent(String event, JSONObject msg) throws NullPointerException {
 		if (socket != null) {
 			socket.send(event, msg);
 		} else {
