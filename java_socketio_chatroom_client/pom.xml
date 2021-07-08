@@ -104,6 +104,7 @@
 						<artifactId>jacoco-maven-plugin</artifactId>
 						<configuration>
 							<excludes>
+								<exclude>**/model/*.*</exclude>
 								<exclude>**/App.*</exclude>
 							</excludes>
 						</configuration>
@@ -121,6 +122,7 @@
 						<artifactId>pitest-maven</artifactId>
 						<configuration>
 							<excludedClasses>
+								<param>io.github.marcodiri.java_socketio_chatroom_server.model.*</param>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.App</param>
 							</excludedClasses>
 							<targetTests>
