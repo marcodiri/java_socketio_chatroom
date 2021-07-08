@@ -90,7 +90,7 @@ public class ChatroomServerMockTest {
     	try {
     		await().atMost(2, SECONDS).untilFalse((serverMock.socketIsInRoom()));
     	} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-    		fail("Client could not join the room");
+    		fail("Client could not leave the room");
     	}
     }
     
