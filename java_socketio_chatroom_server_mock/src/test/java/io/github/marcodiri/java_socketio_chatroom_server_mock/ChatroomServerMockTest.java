@@ -8,6 +8,7 @@ import static org.awaitility.Awaitility.await;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -124,7 +125,7 @@ public class ChatroomServerMockTest {
 	public void testSendEventWhenClientNotConnected() {
 		assertThat(serverMock.getSocket()).isNull();
 		
-		assertThatThrownBy(() -> serverMock.sendEvent("event", "msg"))
+		assertThatThrownBy(() -> serverMock.sendEvent("event", new JSONObject()))
 		.isInstanceOf(NullPointerException.class)
 		.hasMessage("socket is null");
 	}
@@ -143,7 +144,7 @@ public class ChatroomServerMockTest {
 		}
 		
 		try {
-			serverMock.sendEvent("event", "msg");
+			serverMock.sendEvent("event", new JSONObject());
 		} catch (NullPointerException e) {
 			fail("Socket is null");
 		}
