@@ -118,7 +118,7 @@ public class ChatroomServerMockTest {
 			fail("Socket is null");
 		}
 		
-		assertThat(serverMock.getSocket().hasListeners("event"));
+		assertThat(serverMock.getSocket().hasListeners("event")).isTrue();
 	}
 	
 	@Test
