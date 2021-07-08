@@ -9,7 +9,6 @@
 	<packaging>jar</packaging>
 
 	<name>java_socketio_chatroom_server_mock</name>
-	<url>http://maven.apache.org</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
