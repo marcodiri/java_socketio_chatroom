@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>io.github.marcodiri</groupId>
+	<artifactId>java_socketio_chatroom_aggregator</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>java_socketio_chatroom_aggregator</name>
+
+	<modules>
+		<module>../java_socketio_chatroom_parent</module>
+		<module>../java_socketio_chatroom_server</module>
+		<module>../java_socketio_chatroom_server_mock</module>
+		<module>../java_socketio_chatroom_client</module>
+	</modules>
+
+	<profiles>
+		<profile>
+			<id>jacoco</id>
+			<modules>
+				<module>../java_socketio_chatroom_report</module>
+			</modules>
+		</profile>
+	</profiles>
+
+</project>
