@@ -23,6 +23,10 @@
 			**/model/*.*,
 			**/App.*
 		</sonar.coverage.exclusions>
+		
+		<sonar.cpd.exclusions>
+			**/Message.*
+		</sonar.cpd.exclusions>		
 	</properties>
 
 	<dependencyManagement>
