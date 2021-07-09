@@ -24,14 +24,13 @@
 		<socketIO.version>3.0.1</socketIO.version>
 		<engineIO.version>4.0.3</engineIO.version>
 		<engineIO-jetty.version>4.0.3</engineIO-jetty.version>
-
+		
 		<sonar.coverage.exclusions>
 			**/model/*.*,
 			**/ServerWrapper.*,
 			**/ServerWrapper$*.*,
 			**/App.*
 		</sonar.coverage.exclusions>
-
 	</properties>
 
 	<dependencyManagement>

@@ -16,7 +16,7 @@ jobs:
               -Pmutation-testing
               -DrepoToken=$COVERALLS_REPO_TOKEN
               -DpullRequest=${{ github.event.pull_request.number }}
-              coveralls:report
+              org.eluder.coveralls:coveralls-maven-plugin:4.3.0:report
 
     name: Build on ubuntu
     steps:
@@ -38,4 +38,4 @@ jobs:
       run: mvn verify ${{ matrix.additional-maven-args }}
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-      working-directory: java_socketio_chatroom_server
+      working-directory: java_socketio_chatroom_aggregator
