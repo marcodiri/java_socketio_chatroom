@@ -118,7 +118,11 @@ public class ChatroomClientTest {
 			fail("Socket is null");
 		}
 		
-		verify(view).addMessage(msg);
+		try {
+			await().atMost(2, SECONDS).untilAsserted(() -> verify(view).addMessage(msg));
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("AddMessage on ClientView was not called");
+		}
 	}
 
 }
