@@ -18,6 +18,11 @@
 	<properties>
 		<socketIO.version>2.0.1</socketIO.version>
 		<socketServerMock.version>0.0.1-SNAPSHOT</socketServerMock.version>
+		
+		<sonar.coverage.exclusions>
+			**/model/*.*,
+			**/App.*
+		</sonar.coverage.exclusions>
 	</properties>
 
 	<dependencyManagement>

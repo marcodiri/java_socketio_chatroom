@@ -28,6 +28,13 @@
 		<socketIO.version>3.0.1</socketIO.version>
 		<engineIO.version>4.0.3</engineIO.version>
 		<engineIO-jetty.version>4.0.3</engineIO-jetty.version>
+		
+		<sonar.coverage.exclusions>
+			**/ServerWrapper.*,
+			**/ServerWrapper$*.*
+		</sonar.coverage.exclusions>
+    	<aggregate.report.dir>java_socketio_chatroom_report/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
+    	<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<dependencyManagement>

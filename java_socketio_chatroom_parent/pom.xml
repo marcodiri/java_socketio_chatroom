@@ -28,12 +28,13 @@
 		<json.version>20210307</json.version>
 		<jacoco.plugin.version>0.8.7</jacoco.plugin.version>
 		<pitest.plugin.version>1.6.6</pitest.plugin.version>
-		<coveralls.plugin.version>4.3.0</coveralls.plugin.version>
 
 		<sonar.junit.reportPaths>
 			${project.build.directory}/surefire-reports,
 			${project.build.directory}/failsafe-reports
 		</sonar.junit.reportPaths>
+    	<aggregate.report.dir>java_socketio_chatroom_report/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
+    	<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<dependencyManagement>
@@ -226,11 +227,6 @@
 						</mutators>
 						<mutationThreshold>100</mutationThreshold>
 					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.eluder.coveralls</groupId>
-					<artifactId>coveralls-maven-plugin</artifactId>
-					<version>${coveralls.plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>io.fabric8</groupId>
