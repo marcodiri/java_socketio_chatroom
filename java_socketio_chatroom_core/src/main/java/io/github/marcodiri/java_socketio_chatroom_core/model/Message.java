@@ -10,7 +10,7 @@ public abstract class Message {
 	protected final String user;
 	protected final String userMessage;
 	
-	public Message(Timestamp timestamp, String user, String message) {
+	protected Message(Timestamp timestamp, String user, String message) {
 		this.timestamp = new Timestamp(timestamp.getTime());
 		this.user = user;
 		this.userMessage = message;
@@ -27,8 +27,31 @@ public abstract class Message {
 	public String getUserMessage() {
 		return userMessage;
 	}
+
+	public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+
+        obj.put("timestamp", timestamp.getTime());
+        obj.put("user", user);
+        obj.put("message", userMessage);
+
+        return obj;
+    }
 	
-	public abstract JSONObject toJSON();
+	@Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Message{");
+        sb.append("timestamp=").append(timestamp);
+        sb.append(", user=").append(user);
+        sb.append(", message=").append(userMessage);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(timestamp, user, userMessage);
+    }
 	
 	@Override
     public boolean equals(Object o) {
