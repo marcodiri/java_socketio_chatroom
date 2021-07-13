@@ -3,7 +3,7 @@ package io.github.marcodiri.java_socketio_chatroom_client;
 import java.net.URI;
 import org.json.JSONObject;
 
-import io.github.marcodiri.java_socketio_chatroom_client.model.Message;
+import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
 import io.github.marcodiri.java_socketio_chatroom_client.view.ClientView;
 import io.socket.client.IO;
 import io.socket.client.IO.Options;
@@ -40,7 +40,7 @@ public class ChatroomClient {
 		socket.disconnect();
 	}
 
-	public void sendMessage(Message msg) throws RuntimeException {
+	public void sendMessage(ClientMessage msg) throws RuntimeException {
 		if (isConnected()) {
 			socket.emit("msg", msg.toJSON());
 		} else {
@@ -49,7 +49,7 @@ public class ChatroomClient {
 	}
 
 	private void handleMessage() {
-		socket.on("msg",arg -> view.addMessage(new Message((JSONObject) arg[0])));
+		socket.on("msg",arg -> view.addMessage(new ClientMessage((JSONObject) arg[0])));
 	}
 
 }

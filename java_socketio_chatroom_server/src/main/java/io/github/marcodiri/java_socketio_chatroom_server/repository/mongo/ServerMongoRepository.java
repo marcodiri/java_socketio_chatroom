@@ -9,7 +9,7 @@ import org.bson.Document;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import io.github.marcodiri.java_socketio_chatroom_server.model.Message;
+import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
 
 public class ServerMongoRepository implements ServerRepository {
@@ -24,7 +24,7 @@ public class ServerMongoRepository implements ServerRepository {
 	}
 
 	@Override
-	public List<Message> findAll() {
+	public List<ServerMessage> findAll() {
 		return StreamSupport.
 				stream(msgCollection.find().spliterator(), false)
 				.map(this::fromDocumentToMessage)
@@ -32,7 +32,7 @@ public class ServerMongoRepository implements ServerRepository {
 	}
 
 	@Override
-	public void save(Message message) {
+	public void save(ServerMessage message) {
 		msgCollection.insertOne(
 				new Document()
 				.append("timestamp", message.getTimestamp().getTime())
@@ -40,8 +40,8 @@ public class ServerMongoRepository implements ServerRepository {
 				.append("message", message.getUserMessage()));
 	}
 
-	private Message fromDocumentToMessage(Document d) {
-		return new Message(
+	private ServerMessage fromDocumentToMessage(Document d) {
+		return new ServerMessage(
 				new Timestamp(Long.parseLong(d.get("timestamp").toString())), 
 				""+d.get("user"), 
 				""+d.get("message"));

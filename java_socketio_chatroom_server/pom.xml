@@ -36,6 +36,11 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>io.github.marcodiri</groupId>
+				<artifactId>java_socketio_chatroom_core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.mongodb</groupId>
 				<artifactId>mongo-java-driver</artifactId>
 				<version>${mongo.driver.version}</version>
@@ -79,6 +84,10 @@
 	</dependencyManagement>
 
 	<dependencies>
+		<dependency>
+			<groupId>io.github.marcodiri</groupId>
+			<artifactId>java_socketio_chatroom_core</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
@@ -147,6 +156,13 @@
 		</pluginManagement>
 		
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
