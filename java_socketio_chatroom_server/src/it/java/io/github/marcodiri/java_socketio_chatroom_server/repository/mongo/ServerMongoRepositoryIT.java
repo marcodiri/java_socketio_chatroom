@@ -18,7 +18,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-import io.github.marcodiri.java_socketio_chatroom_server.model.Message;
+import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 
 public class ServerMongoRepositoryIT {
 	private static final int mongoPort = Integer.parseInt(System.getProperty("mongo.port", "27017"));
@@ -66,21 +66,21 @@ public class ServerMongoRepositoryIT {
 
 		assertThat(serverRepository.findAll())
 			.containsExactly(
-					new Message(ts1, "user1", "message1"),
-					new Message(ts2, "user2", "message2")
+					new ServerMessage(ts1, "user1", "message1"),
+					new ServerMessage(ts2, "user2", "message2")
 					);
 	}
 	
 	@Test
 	public void testSave() {
-		Message msg = new Message(new Timestamp(System.currentTimeMillis()), "user", "message");
+		ServerMessage msg = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
 		serverRepository.save(msg);
 		assertThat(readAllMessages()).containsExactly(msg);
 	}
 	
-	private List<Message> readAllMessages() {
+	private List<ServerMessage> readAllMessages() {
 		return StreamSupport.stream(messagesCollection.find().spliterator(), false)
-				.map(d -> new Message(
+				.map(d -> new ServerMessage(
 						new Timestamp(Long.parseLong(d.get("timestamp").toString())), 
 						"" + d.get("user"),
 						"" + d.get("message")))

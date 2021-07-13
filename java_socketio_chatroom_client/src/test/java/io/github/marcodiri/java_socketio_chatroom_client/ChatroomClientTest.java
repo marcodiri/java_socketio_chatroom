@@ -15,7 +15,7 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import io.github.marcodiri.java_socketio_chatroom_client.model.Message;
+import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
 import io.github.marcodiri.java_socketio_chatroom_client.view.ClientView;
 import io.github.marcodiri.java_socketio_chatroom_server_mock.ChatroomServerMock;
 import io.socket.client.IO;
@@ -65,7 +65,7 @@ public class ChatroomClientTest {
 
 	@Test
 	public void testSendMessageWhenClientNotConnected() {
-		Message msg = new Message(new Timestamp(System.currentTimeMillis()), "user", "message");
+		ClientMessage msg = new ClientMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
 
 		assertThatThrownBy(() -> client.sendMessage(msg)).isInstanceOf(RuntimeException.class)
 				.hasMessage("Unable to send message when not connected to server");
@@ -86,7 +86,7 @@ public class ChatroomClientTest {
 			fail("Socket is not connected to server");
 		}
 
-		Message msg = new Message(new Timestamp(System.currentTimeMillis()), "user", "message");
+		ClientMessage msg = new ClientMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
 		try {
 			client.sendMessage(msg);
 		} catch (RuntimeException e) {
@@ -94,7 +94,7 @@ public class ChatroomClientTest {
 		}
 
 		try {
-			await().atMost(2, SECONDS).until(() -> msg.equals(new Message(serverMock.receivedMsg)));
+			await().atMost(2, SECONDS).until(() -> msg.equals(new ClientMessage(serverMock.receivedMsg)));
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Server did not receive the correct message");
 		}
@@ -109,7 +109,7 @@ public class ChatroomClientTest {
 			fail("Client could not connect to server");
 		}
 
-		Message msg = new Message(new Timestamp(System.currentTimeMillis()), "user", "message");
+		ClientMessage msg = new ClientMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
 		try {
 			serverMock.sendEvent("msg", msg.toJSON());
 		} catch (NullPointerException e) {

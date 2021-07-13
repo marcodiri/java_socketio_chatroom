@@ -1,6 +1,6 @@
 package io.github.marcodiri.java_socketio_chatroom_server;
 
-import io.github.marcodiri.java_socketio_chatroom_server.model.Message;
+import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
 
 import io.socket.socketio.server.SocketIoNamespace;
@@ -46,8 +46,8 @@ public class ChatroomServer {
     private void handleClientJoin(SocketIoSocket socket) {
         socket.on("join", arg -> {
             socket.joinRoom(CHATROOM_NAME);
-            List<Message> history = repository.findAll();
-            for (Message message : history) {
+            List<ServerMessage> history = repository.findAll();
+            for (ServerMessage message : history) {
                 socket.send("msg", message.toJSON());
             }
         });
@@ -57,7 +57,7 @@ public class ChatroomServer {
         socket.on("msg", arg -> {
             namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
             JSONObject jsonMsg = (JSONObject) arg[0];
-            Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
+            ServerMessage incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             repository.save(incomingMessage);
         });
     }
