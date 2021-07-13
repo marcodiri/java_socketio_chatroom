@@ -8,6 +8,7 @@ import io.socket.socketio.server.SocketIoSocket;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChatroomServer {
@@ -45,20 +46,24 @@ public class ChatroomServer {
 
     private void handleClientJoin(SocketIoSocket socket) {
         socket.on("join", arg -> {
-            socket.joinRoom(CHATROOM_NAME);
-            List<Message> history = repository.findAll();
-            for (Message message : history) {
-                socket.send("msg", message.toJSON());
+            if (!Arrays.asList(namespace.getAdapter().listClientRooms(socket)).contains(CHATROOM_NAME)) { // check if client is already in room
+                socket.joinRoom(CHATROOM_NAME);
+                List<Message> history = repository.findAll();
+                for (Message message : history) {
+                    socket.send("msg", message.toJSON());
+                }
             }
         });
     }
 
     private void handleClientMessage(SocketIoSocket socket, SocketIoNamespace namespace) {
         socket.on("msg", arg -> {
-            namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
-            JSONObject jsonMsg = (JSONObject) arg[0];
-            Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
-            repository.save(incomingMessage);
+            if (Arrays.asList(namespace.getAdapter().listClientRooms(socket)).contains(CHATROOM_NAME)) { // check if client is in room
+                namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
+                JSONObject jsonMsg = (JSONObject) arg[0];
+                Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
+                repository.save(incomingMessage);
+            }
         });
     }
 
