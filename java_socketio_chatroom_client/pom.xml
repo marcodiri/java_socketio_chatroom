@@ -135,7 +135,7 @@
 								<param>io.github.marcodiri.java_socketio_chatroom_client.App</param>
 							</excludedClasses>
 							<targetTests>
-								<param>io.github.marcodiri.java_socketio_chatroom_client.*</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_client.*Test</param>
 							</targetTests>
 						</configuration>
 						<executions>

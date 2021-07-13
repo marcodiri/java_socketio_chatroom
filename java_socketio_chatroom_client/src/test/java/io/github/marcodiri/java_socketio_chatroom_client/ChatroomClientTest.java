@@ -81,9 +81,7 @@ public class ChatroomClientTest {
 		}
 
 		try {
-			serverMock.handleEvent("msg", arg -> {
-				serverMock.receivedMsg = (JSONObject) arg[0];
-			});
+			serverMock.handleEvent("msg", arg -> serverMock.receivedMsg = (JSONObject) arg[0]);
 		} catch (NullPointerException e) {
 			fail("Socket is not connected to server");
 		}
@@ -91,7 +89,7 @@ public class ChatroomClientTest {
 		Message msg = new Message(new Timestamp(System.currentTimeMillis()), "user", "message");
 		try {
 			client.sendMessage(msg);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			fail(e.getMessage());
 		}
 

@@ -13,7 +13,7 @@ public class ChatroomClient {
 
 	private final Socket socket;
 	
-	private ClientView view;
+	private final ClientView view;
 
 	public ChatroomClient(URI uri, Options options, ClientView view) {
 		this.socket = IO.socket(uri, options);
