@@ -46,7 +46,7 @@ public class ChatroomServer {
 
     private void handleClientJoin(SocketIoSocket socket) {
         socket.on("join", arg -> {
-            if (!Arrays.asList(namespace.getAdapter().listClientRooms(socket)).contains(CHATROOM_NAME)) { // check if client is already in room
+            if (!socketIsInRoom(socket)) {
                 socket.joinRoom(CHATROOM_NAME);
                 List<Message> history = repository.findAll();
                 for (Message message : history) {
@@ -58,7 +58,7 @@ public class ChatroomServer {
 
     private void handleClientMessage(SocketIoSocket socket, SocketIoNamespace namespace) {
         socket.on("msg", arg -> {
-            if (Arrays.asList(namespace.getAdapter().listClientRooms(socket)).contains(CHATROOM_NAME)) { // check if client is in room
+            if (socketIsInRoom(socket)) {
                 namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
                 JSONObject jsonMsg = (JSONObject) arg[0];
                 Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
@@ -73,6 +73,10 @@ public class ChatroomServer {
 
     SocketIoNamespace getNamespace() {
         return namespace;
+    }
+
+    private boolean socketIsInRoom(SocketIoSocket socket) {
+        return Arrays.asList(namespace.getAdapter().listClientRooms(socket)).contains(CHATROOM_NAME);
     }
 
 }
