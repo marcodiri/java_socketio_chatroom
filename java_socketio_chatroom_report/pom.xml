@@ -18,6 +18,10 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>java_socketio_chatroom_core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>java_socketio_chatroom_server</artifactId>
 		</dependency>
 		<dependency>

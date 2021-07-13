@@ -19,6 +19,38 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<sonar.coverage.exclusions>
+			**/model/*.*
+		</sonar.coverage.exclusions>
 	</properties>
 
+	<profiles>
+		<profile>
+			<id>jacoco</id>
+			<activation>
+				<!-- Activated when the system property "skipCoverage" is not defined 
+					at all or is defined with a value which is not "true", thus, implicitly active 
+					by default -->
+				<property>
+					<name>skipCoverage</name>
+					<value>!true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- configured in pluginManagement -->
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<exclude>**/model/*.*</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
