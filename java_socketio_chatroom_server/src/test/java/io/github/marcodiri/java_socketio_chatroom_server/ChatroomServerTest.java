@@ -17,6 +17,7 @@ import java.net.URI;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -156,5 +157,44 @@ public class ChatroomServerTest {
             fail("Expected 0 but got " + chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length);
         }
 
+    }
+
+    @Test
+    public void testServerIgnoresJoinFromAnInRoomClient() {
+        when(serverRepository.findAll()).thenReturn(new ArrayList<>());
+
+        clientSocket.on(Socket.EVENT_CONNECT, objects -> {
+            clientSocket.emit("join");
+
+            clientSocket.emit("join");
+        });
+        clientSocket.connect();
+
+        try {
+            await().during(2, SECONDS).atMost(3, SECONDS).until(() -> chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length == 1);
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected 1 but got " + chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length);
+        }
+
+        verify(serverRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testServerIgnoresMessagesFromANonInRoomClient() {
+        AtomicBoolean msgReceived = new AtomicBoolean(false);
+
+        clientSocket.on(Socket.EVENT_CONNECT, objects -> {
+            Message msg = new Message(new Timestamp(System.currentTimeMillis()), "user", "message");
+            clientSocket.emit("msg", msg.toJSON());
+        });
+        clientSocket.on("msg", arg -> msgReceived.set(true));
+        clientSocket.connect();
+
+        try {
+            await().during(2, SECONDS).atMost(3, SECONDS).untilFalse(msgReceived);
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected no msg received but got instead");
+        }
+        verifyNoInteractions(serverRepository);
     }
 }
