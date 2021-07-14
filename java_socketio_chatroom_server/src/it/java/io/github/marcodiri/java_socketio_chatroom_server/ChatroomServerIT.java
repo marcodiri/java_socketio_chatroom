@@ -2,6 +2,7 @@ package io.github.marcodiri.java_socketio_chatroom_server;
 
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.mongo.ServerMongoRepository;
@@ -99,7 +100,7 @@ public class ChatroomServerIT {
         });
         clientSocket.connect();
 
-        AtomicReference<List<ServerMessage>> retrievedMessages = new AtomicReference<>();
+        AtomicReference<List<Message>> retrievedMessages = new AtomicReference<>();
 
         try {
             await().atMost(2, SECONDS).until(() -> {

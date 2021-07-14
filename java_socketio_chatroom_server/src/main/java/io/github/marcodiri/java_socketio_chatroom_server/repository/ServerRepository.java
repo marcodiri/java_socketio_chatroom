@@ -2,10 +2,10 @@ package io.github.marcodiri.java_socketio_chatroom_server.repository;
 
 import java.util.List;
 
-import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 
 public interface ServerRepository {
-	public List<ServerMessage> findAll();
+	public List<Message> findAll();
 
-	public void save(ServerMessage message);
+	public void save(Message message);
 }

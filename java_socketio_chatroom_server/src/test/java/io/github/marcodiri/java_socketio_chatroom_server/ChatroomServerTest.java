@@ -1,5 +1,6 @@
 package io.github.marcodiri.java_socketio_chatroom_server;
 
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
 
@@ -55,7 +56,7 @@ public class ChatroomServerTest {
 
     @Test
     public void testClientJoinRetrievesMessagesFromDb() {
-        List<ServerMessage> history = new ArrayList<>();
+        List<Message> history = new ArrayList<>();
         ServerMessage msg1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
         ServerMessage msg2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
         history.add(msg1);
