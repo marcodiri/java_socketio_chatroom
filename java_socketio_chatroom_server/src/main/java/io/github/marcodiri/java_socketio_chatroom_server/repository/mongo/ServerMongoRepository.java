@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 import org.bson.Document;
 
 import com.mongodb.MongoClient;
@@ -24,7 +25,7 @@ public class ServerMongoRepository implements ServerRepository {
 	}
 
 	@Override
-	public List<ServerMessage> findAll() {
+	public List<Message> findAll() {
 		return StreamSupport.
 				stream(msgCollection.find().spliterator(), false)
 				.map(this::fromDocumentToMessage)
@@ -32,7 +33,7 @@ public class ServerMongoRepository implements ServerRepository {
 	}
 
 	@Override
-	public void save(ServerMessage message) {
+	public void save(Message message) {
 		msgCollection.insertOne(
 				new Document()
 				.append("timestamp", message.getTimestamp().getTime())
@@ -40,7 +41,7 @@ public class ServerMongoRepository implements ServerRepository {
 				.append("message", message.getUserMessage()));
 	}
 
-	private ServerMessage fromDocumentToMessage(Document d) {
+	private Message fromDocumentToMessage(Document d) {
 		return new ServerMessage(
 				new Timestamp(Long.parseLong(d.get("timestamp").toString())), 
 				""+d.get("user"), 
