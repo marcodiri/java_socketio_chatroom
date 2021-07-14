@@ -184,7 +184,7 @@ public class ChatroomServerTest {
         AtomicBoolean msgReceived = new AtomicBoolean(false);
 
         clientSocket.on(Socket.EVENT_CONNECT, objects -> {
-            Message msg = new Message(new Timestamp(System.currentTimeMillis()), "user", "message");
+            Message msg = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
             clientSocket.emit("msg", msg.toJSON());
         });
         clientSocket.on("msg", arg -> msgReceived.set(true));
