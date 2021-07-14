@@ -44,6 +44,12 @@
 				<version>${socketServerMock.version}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>io.github.marcodiri</groupId>
+				<artifactId>java_socketio_chatroom_server</artifactId>
+				<version>${project.version}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -59,6 +65,10 @@
 		<dependency>
 			<groupId>io.github.marcodiri</groupId>
 			<artifactId>java_socketio_chatroom_server_mock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.marcodiri</groupId>
+			<artifactId>java_socketio_chatroom_server</artifactId>
 		</dependency>
 	</dependencies>
 
