@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 import org.bson.Document;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import io.github.marcodiri.java_socketio_chatroom_server.model.Message;
+import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
 
 public class ServerMongoRepository implements ServerRepository {
@@ -41,7 +42,7 @@ public class ServerMongoRepository implements ServerRepository {
 	}
 
 	private Message fromDocumentToMessage(Document d) {
-		return new Message(
+		return new ServerMessage(
 				new Timestamp(Long.parseLong(d.get("timestamp").toString())), 
 				""+d.get("user"), 
 				""+d.get("message"));

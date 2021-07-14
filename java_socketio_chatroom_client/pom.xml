@@ -2,7 +2,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>io.github.marcodiri</groupId>
 		<artifactId>java_socketio_chatroom_parent</artifactId>
@@ -18,15 +18,12 @@
 	<properties>
 		<socketIO.version>2.0.1</socketIO.version>
 		<socketServerMock.version>0.0.1-SNAPSHOT</socketServerMock.version>
-		
+
 		<sonar.coverage.exclusions>
 			**/model/*.*,
 			**/App.*
 		</sonar.coverage.exclusions>
-		
-		<sonar.cpd.exclusions>
-			**/Message.*
-		</sonar.cpd.exclusions>		
+
 	</properties>
 
 	<dependencyManagement>
@@ -38,8 +35,19 @@
 			</dependency>
 			<dependency>
 				<groupId>io.github.marcodiri</groupId>
+				<artifactId>java_socketio_chatroom_core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.marcodiri</groupId>
 				<artifactId>java_socketio_chatroom_server_mock</artifactId>
 				<version>${socketServerMock.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.github.marcodiri</groupId>
+				<artifactId>java_socketio_chatroom_server</artifactId>
+				<version>${project.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -52,7 +60,15 @@
 		</dependency>
 		<dependency>
 			<groupId>io.github.marcodiri</groupId>
+			<artifactId>java_socketio_chatroom_core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.marcodiri</groupId>
 			<artifactId>java_socketio_chatroom_server_mock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.marcodiri</groupId>
+			<artifactId>java_socketio_chatroom_server</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -87,6 +103,13 @@
 		</pluginManagement>
 
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
@@ -135,7 +158,7 @@
 								<param>io.github.marcodiri.java_socketio_chatroom_client.App</param>
 							</excludedClasses>
 							<targetTests>
-								<param>io.github.marcodiri.java_socketio_chatroom_client.*</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_client.*Test</param>
 							</targetTests>
 						</configuration>
 						<executions>

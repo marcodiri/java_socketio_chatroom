@@ -1,6 +1,7 @@
 package io.github.marcodiri.java_socketio_chatroom_server;
 
-import io.github.marcodiri.java_socketio_chatroom_server.model.Message;
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
+import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
 
 import io.socket.client.IO;
@@ -57,16 +58,16 @@ public class ChatroomServerTest {
     @Test
     public void testClientJoinRetrievesMessagesFromDb() {
         List<Message> history = new ArrayList<>();
-        Message msg1 = new Message(new Timestamp(System.currentTimeMillis()), "user1", "message1");
-        Message msg2 = new Message(new Timestamp(System.currentTimeMillis()), "user2", "message2");
+        ServerMessage msg1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
+        ServerMessage msg2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
         history.add(msg1);
         history.add(msg2);
         when(serverRepository.findAll()).thenReturn(history);
 
-        List<Message> retrievedMessages = new ArrayList<>();
+        List<ServerMessage> retrievedMessages = new ArrayList<>();
         clientSocket.on("msg", arg -> {
             JSONObject jsonMsg = (JSONObject) arg[0];
-            Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
+            ServerMessage incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             retrievedMessages.add(incomingMessage);
         });
         clientSocket.on(Socket.EVENT_CONNECT, objects -> clientSocket.emit("join"));
@@ -82,15 +83,15 @@ public class ChatroomServerTest {
 
     @Test
     public void testClientReceivesItsMessages() {
-        Message originalMessage1 = new Message(new Timestamp(System.currentTimeMillis()), "user1", "message1");
-        Message originalMessage2 = new Message(new Timestamp(System.currentTimeMillis()), "user2", "message2");
+        ServerMessage originalMessage1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
+        ServerMessage originalMessage2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
 
         when(serverRepository.findAll()).thenReturn(new ArrayList<>());
 
-        List<Message> retrievedMessages = new ArrayList<>();
+        List<ServerMessage> retrievedMessages = new ArrayList<>();
         clientSocket.on("msg", arg -> {
             JSONObject jsonMsg = (JSONObject) arg[0];
-            Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
+            ServerMessage incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             retrievedMessages.add(incomingMessage);
         });
         clientSocket.on(Socket.EVENT_CONNECT, objects -> {
@@ -109,15 +110,15 @@ public class ChatroomServerTest {
 
     @Test
     public void testMessagesAreSavedInDb() {
-        Message originalMessage1 = new Message(new Timestamp(System.currentTimeMillis()), "user1", "message1");
-        Message originalMessage2 = new Message(new Timestamp(System.currentTimeMillis()), "user2", "message2");
+        ServerMessage originalMessage1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
+        ServerMessage originalMessage2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
 
         when(serverRepository.findAll()).thenReturn(new ArrayList<>());
 
-        List<Message> retrievedMessages = new ArrayList<>();
+        List<ServerMessage> retrievedMessages = new ArrayList<>();
         clientSocket.on("msg", arg -> {
             JSONObject jsonMsg = (JSONObject) arg[0];
-            Message incomingMessage = new Message(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
+            ServerMessage incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             retrievedMessages.add(incomingMessage);
         });
         clientSocket.on(Socket.EVENT_CONNECT, objects -> {
@@ -127,14 +128,14 @@ public class ChatroomServerTest {
         });
         clientSocket.connect();
 
-        ArgumentCaptor<Message> argumentCaptor = ArgumentCaptor.forClass(Message.class);
+        ArgumentCaptor<ServerMessage> argumentCaptor = ArgumentCaptor.forClass(ServerMessage.class);
         try {
             await().atMost(2, SECONDS).until(() -> !retrievedMessages.isEmpty());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Expected " + asList(originalMessage1, originalMessage2) + " but got " + retrievedMessages);
         }
         verify(serverRepository, times(2)).save(argumentCaptor.capture());
-        List<Message> capturedArgument = argumentCaptor.getAllValues();
+        List<ServerMessage> capturedArgument = argumentCaptor.getAllValues();
 
         assertThat(capturedArgument).contains(originalMessage1, originalMessage2);
     }
@@ -183,7 +184,7 @@ public class ChatroomServerTest {
         AtomicBoolean msgReceived = new AtomicBoolean(false);
 
         clientSocket.on(Socket.EVENT_CONNECT, objects -> {
-            Message msg = new Message(new Timestamp(System.currentTimeMillis()), "user", "message");
+            Message msg = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
             clientSocket.emit("msg", msg.toJSON());
         });
         clientSocket.on("msg", arg -> msgReceived.set(true));
