@@ -30,6 +30,7 @@ public class ChatroomClient {
 
 	public void connect() {
 		socket.on(Socket.EVENT_CONNECT, objects -> {
+			handleJoin();
 			socket.emit("join");
 			handleMessage();
 		});
@@ -48,8 +49,11 @@ public class ChatroomClient {
 		}
 	}
 
-	private void handleMessage() {
+	void handleMessage() {
 		socket.on("msg",arg -> view.addMessage(new ClientMessage((JSONObject) arg[0])));
 	}
 
+	void handleJoin() {
+		socket.on("joined", args -> view.roomJoined(((JSONObject) args[0]).getString("roomName")));
+	}
 }

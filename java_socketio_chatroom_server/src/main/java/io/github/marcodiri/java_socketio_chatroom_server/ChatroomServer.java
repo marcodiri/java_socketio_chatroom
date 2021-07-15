@@ -49,6 +49,7 @@ public class ChatroomServer {
         socket.on("join", arg -> {
             if (!socketIsInRoom(socket)) {
                 socket.joinRoom(CHATROOM_NAME);
+                socket.send("joined", new JSONObject("{roomName: " + CHATROOM_NAME + "}"));
                 List<Message> history = repository.findAll();
                 for (Message message : history) {
                     socket.send("msg", message.toJSON());
