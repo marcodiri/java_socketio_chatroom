@@ -59,7 +59,8 @@ public class ChatroomClientTest {
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Socket could not join the room");
 		}
-
+		
+		verify(view).connectedToServer();
 		assertThat(client.getSocket().hasListeners("msg")).isTrue();
 		assertThat(client.getSocket().hasListeners("joined")).isTrue();
 	}
