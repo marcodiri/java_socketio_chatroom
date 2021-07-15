@@ -61,6 +61,7 @@ public class ChatroomClientTest {
 		}
 
 		assertThat(client.getSocket().hasListeners("msg")).isTrue();
+		assertThat(client.getSocket().hasListeners("joined")).isTrue();
 	}
 
 	@Test
@@ -73,7 +74,7 @@ public class ChatroomClientTest {
 
 	@Test
 	public void testSendMessageWhenClientConnected() {
-		client.connect();
+		client.getSocket().connect();
 		try {
 			await().atMost(2, SECONDS).until(() -> client.isConnected());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
@@ -102,7 +103,8 @@ public class ChatroomClientTest {
 
 	@Test
 	public void testHandleMessage() {
-		client.connect();
+		client.getSocket().connect();
+		client.handleMessage();
 		try {
 			await().atMost(2, SECONDS).until(() -> client.isConnected());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
@@ -121,6 +123,27 @@ public class ChatroomClientTest {
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("AddMessage on ClientView was not called");
 		}
+	}
+
+	@Test
+	public void testHandleJoin() {
+		client.getSocket().connect();
+		client.handleJoin();
+		try {
+			await().atMost(2, SECONDS).until(() -> client.isConnected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Client could not connect to server");
+		}
+
+		serverMock.handleEvent("join", arg -> serverMock.sendEvent("joined", new JSONObject("{roomName: RoomName}")));
+		client.getSocket().emit("join");
+
+		try {
+			await().atMost(2, SECONDS).untilAsserted(() -> verify(view).roomJoined("RoomName"));
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("RoomJoined on ClientView was not called");
+		}
+
 	}
 
 }
