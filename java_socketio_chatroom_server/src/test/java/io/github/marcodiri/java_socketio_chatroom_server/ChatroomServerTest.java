@@ -82,6 +82,21 @@ public class ChatroomServerTest {
     }
 
     @Test
+    public void testHandleClientJoinSendsJoinedEvent() {
+        AtomicBoolean chatRoomNameReceived = new AtomicBoolean(false);
+
+        clientSocket.on("joined", args -> chatRoomNameReceived.set(((JSONObject) args[0]).has("roomName")));
+        clientSocket.on(Socket.EVENT_CONNECT, objects -> clientSocket.emit("join"));
+        clientSocket.connect();
+
+        try {
+            await().atMost(2, SECONDS).untilTrue(chatRoomNameReceived);
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected true but got " + chatRoomNameReceived.get());
+        }
+    }
+
+    @Test
     public void testClientReceivesItsMessages() {
         ServerMessage originalMessage1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
         ServerMessage originalMessage2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
