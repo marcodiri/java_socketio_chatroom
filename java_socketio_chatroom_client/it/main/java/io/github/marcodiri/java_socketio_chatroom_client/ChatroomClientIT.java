@@ -15,6 +15,8 @@ import org.mockito.*;
 
 import java.net.URI;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -56,7 +58,7 @@ public class ChatroomClientIT {
 
     @Test
     public void testRetrieveMsgInRepositoryOnConnection() {
-        Message serverMessage = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
+        Message serverMessage = new ServerMessage(new Timestamp(0), "user", "message");
         when(mongoRepository.findAll()).thenReturn(Collections.singletonList(serverMessage));
 
         chatroomClient.connect();
@@ -78,7 +80,7 @@ public class ChatroomClientIT {
             fail("Client cannot connect to server");
         }
 
-        ClientMessage clientMessage = new ClientMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
+        ClientMessage clientMessage = new ClientMessage(new Timestamp(0), "user", "message");
         chatroomClient.sendMessage(clientMessage);
 
         Message serverMessage = new ServerMessage(clientMessage.getTimestamp(), clientMessage.getUser(), clientMessage.getUserMessage());
