@@ -15,8 +15,6 @@ import org.mockito.*;
 
 import java.net.URI;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
