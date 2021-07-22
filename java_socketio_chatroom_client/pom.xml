@@ -167,10 +167,15 @@
 							<excludedClasses>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.model.*</param>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.App</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_client.view.ClientView</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_client.view.swing.ClientSwingView*</param>
 							</excludedClasses>
 							<targetTests>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.*Test</param>
 							</targetTests>
+							<excludedTestClasses>
+								<param>io.github.marcodiri.java_socketio_chatroom_client.view.swing.ClientSwingViewTest</param>
+							</excludedTestClasses>
 						</configuration>
 						<executions>
 							<execution>
