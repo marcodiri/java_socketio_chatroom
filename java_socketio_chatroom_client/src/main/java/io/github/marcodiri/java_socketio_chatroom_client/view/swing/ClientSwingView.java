@@ -17,6 +17,8 @@ import java.awt.Insets;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.Timestamp;
@@ -35,7 +37,7 @@ public class ClientSwingView extends JFrame implements ClientView {
 	private MessageBoard msgsBoard;
 	private JButton btnSend;
 	
-	private ChatroomClient client;
+	private transient ChatroomClient client;
 	private JLabel lblUsername;
 	private JTextField txtUsername;
 	private Component verticalStrut;
@@ -69,7 +71,7 @@ public class ClientSwingView extends JFrame implements ClientView {
 	public ClientSwingView(MessageBoard board) {
 		setPreferredSize(new Dimension(500, 500));
 		setTitle("Socket.io Chatroom");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setBounds(100, 100, 500, 500);
 		setMinimumSize(new Dimension(300, 300));
 		contentPane = new JPanel();
@@ -230,13 +232,10 @@ public class ClientSwingView extends JFrame implements ClientView {
 
 	@Override
 	public void roomJoined(String roomName) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
+		SwingUtilities.invokeLater(() -> {
 				btnDisconnect.setEnabled(true);
 				txtMessage.setEnabled(true);
 				msgsBoard.setEnabled(true);
-			}
 		});
 	}
 

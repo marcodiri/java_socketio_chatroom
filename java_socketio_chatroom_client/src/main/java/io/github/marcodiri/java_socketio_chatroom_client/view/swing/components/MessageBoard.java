@@ -12,7 +12,7 @@ import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 @SuppressWarnings("serial")
 public class MessageBoard extends JTextPane {
 
-	private List<Message> history = new ArrayList<>();
+	private transient List<Message> history = new ArrayList<>();
 
 	public List<Message> getHistory() {
 		return history;
