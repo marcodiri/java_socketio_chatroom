@@ -65,8 +65,7 @@ public class ClientSwingView extends JFrame implements ClientView {
 
 	/**
 	 * Create the frame.
-	 * @param client 
-	 * @param msgsBoard 
+	 * @param board
 	 */
 	public ClientSwingView(MessageBoard board) {
 		setPreferredSize(new Dimension(500, 500));

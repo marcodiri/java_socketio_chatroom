@@ -7,7 +7,6 @@ import io.github.marcodiri.java_socketio_chatroom_server.ChatroomServer;
 import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
 import io.socket.client.IO;
-import io.socket.client.Socket;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

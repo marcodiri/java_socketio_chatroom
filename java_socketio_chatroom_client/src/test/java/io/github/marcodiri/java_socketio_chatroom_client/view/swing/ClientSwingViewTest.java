@@ -260,14 +260,9 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	private void setEnabled(Component component, boolean enable) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				component.setEnabled(enable);
-			}
-		});
+		SwingUtilities.invokeLater(() -> component.setEnabled(enable));
 		try {
-			await().atMost(2, SECONDS).until(() -> enable ? component.isEnabled() : !component.isEnabled());
+			await().atMost(2, SECONDS).until(() -> enable == component.isEnabled());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Could not set component");
 		}
