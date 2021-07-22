@@ -60,7 +60,6 @@ public class ChatroomClientTest {
 			fail("Socket could not join the room");
 		}
 		
-		verify(view).connectedToServer();
 		assertThat(client.getSocket().hasListeners("msg")).isTrue();
 		assertThat(client.getSocket().hasListeners("joined")).isTrue();
 	}

@@ -30,7 +30,6 @@ public class ChatroomClient {
 
 	public void connect() {
 		socket.on(Socket.EVENT_CONNECT, objects -> {
-			view.connectedToServer();
 			handleJoin();
 			socket.emit("join");
 			handleMessage();

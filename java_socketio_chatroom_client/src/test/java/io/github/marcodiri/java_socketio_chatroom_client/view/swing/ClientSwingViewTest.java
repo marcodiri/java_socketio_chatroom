@@ -69,7 +69,6 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 	
 	@Test
-	@GUITest
 	public void testRoomJoined() {
 		clientSwingView.roomJoined("RoomName");
 		try {

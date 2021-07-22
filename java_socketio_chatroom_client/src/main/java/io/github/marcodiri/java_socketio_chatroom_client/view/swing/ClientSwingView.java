@@ -1,8 +1,6 @@
 package io.github.marcodiri.java_socketio_chatroom_client.view.swing;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -12,8 +10,6 @@ import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
 import io.github.marcodiri.java_socketio_chatroom_client.view.ClientView;
 import io.github.marcodiri.java_socketio_chatroom_client.view.swing.components.MessageBoard;
 import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
-import io.socket.client.IO;
-
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.JButton;
@@ -21,18 +17,14 @@ import java.awt.Insets;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.net.URI;
 import java.sql.Timestamp;
-import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 import javax.swing.Box;
-import javax.swing.JSeparator;
 import java.awt.Component;
-import javax.swing.SwingConstants;
 
+@SuppressWarnings("serial")
 public class ClientSwingView extends JFrame implements ClientView {
 
 	private JPanel contentPane;
@@ -234,11 +226,6 @@ public class ClientSwingView extends JFrame implements ClientView {
 	@Override
 	public void addMessage(Message msg) {
 		msgsBoard.newMessageNotify(msg);
-	}
-
-	@Override
-	public void connectedToServer() {
-		return;
 	}
 
 	@Override
