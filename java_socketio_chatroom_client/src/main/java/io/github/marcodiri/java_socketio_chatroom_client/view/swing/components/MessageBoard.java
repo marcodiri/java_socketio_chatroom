@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.JTextPane;
 
+import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
 import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 
 @SuppressWarnings("serial")
@@ -20,8 +21,7 @@ public class MessageBoard extends JTextPane {
 
 	public void newMessageNotify(Message msg) {
 		history.add(msg);
-		DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-		String formattedMsg = dateFormat.format(msg.getTimestamp()) + " " + msg.getUser() + ": " + msg.getUserMessage();
+		String formattedMsg = msg.getFormattedMessage();
 		if (!getText().isEmpty()) {
 			formattedMsg = System.lineSeparator() + formattedMsg;
 		}
