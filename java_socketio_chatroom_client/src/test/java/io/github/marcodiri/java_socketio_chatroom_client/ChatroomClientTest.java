@@ -67,7 +67,7 @@ public class ChatroomClientTest {
 
 	@Test
 	public void testSendMessageWhenClientNotConnected() {
-		ClientMessage msg = new ClientMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
+		ClientMessage msg = new ClientMessage(new Timestamp(0), "user", "message");
 
 		assertThatThrownBy(() -> client.sendMessage(msg)).isInstanceOf(RuntimeException.class)
 				.hasMessage("Unable to send message when not connected to server");
@@ -88,7 +88,7 @@ public class ChatroomClientTest {
 			fail("Socket is not connected to server");
 		}
 
-		ClientMessage msg = new ClientMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
+		ClientMessage msg = new ClientMessage(new Timestamp(0), "user", "message");
 		try {
 			client.sendMessage(msg);
 		} catch (RuntimeException e) {
@@ -112,7 +112,7 @@ public class ChatroomClientTest {
 			fail("Client could not connect to server");
 		}
 
-		ClientMessage msg = new ClientMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
+		ClientMessage msg = new ClientMessage(new Timestamp(0), "user", "message");
 		try {
 			serverMock.sendEvent("msg", msg.toJSON());
 		} catch (NullPointerException e) {
