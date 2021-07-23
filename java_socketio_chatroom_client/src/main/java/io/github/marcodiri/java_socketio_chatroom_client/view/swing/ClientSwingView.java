@@ -25,6 +25,9 @@ import java.sql.Timestamp;
 import javax.swing.JScrollPane;
 import javax.swing.Box;
 import java.awt.Component;
+import javax.swing.JTextPane;
+import java.awt.Font;
+import java.awt.Color;
 
 @SuppressWarnings("serial")
 public class ClientSwingView extends JFrame implements ClientView {
@@ -42,6 +45,8 @@ public class ClientSwingView extends JFrame implements ClientView {
 	private JTextField txtUsername;
 	private Component verticalStrut;
 	private Component verticalStrut_1;
+	private Component verticalStrut_2;
+	private JTextPane txtErrorMessage;
 	
 	
 	/**
@@ -78,9 +83,9 @@ public class ClientSwingView extends JFrame implements ClientView {
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{125, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0};
 		gbl_contentPane.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
 		lblUsername = new JLabel("Username");
@@ -98,14 +103,19 @@ public class ClientSwingView extends JFrame implements ClientView {
 		contentPane.add(lblMessages, gbc_lblMessages);
 		
 		Box verticalBox = Box.createVerticalBox();
+		verticalBox.setMinimumSize(new Dimension(112, 0));
+		verticalBox.setPreferredSize(new Dimension(112, 0));
+		verticalBox.setSize(new Dimension(112, 0));
+		verticalBox.setMaximumSize(new Dimension(112, 0));
 		GridBagConstraints gbc_verticalBox = new GridBagConstraints();
-		gbc_verticalBox.fill = GridBagConstraints.BOTH;
+		gbc_verticalBox.fill = GridBagConstraints.VERTICAL;
 		gbc_verticalBox.insets = new Insets(0, 0, 5, 5);
 		gbc_verticalBox.gridx = 0;
 		gbc_verticalBox.gridy = 1;
 		contentPane.add(verticalBox, gbc_verticalBox);
 		
 		btnConnect = new JButton("Connect");
+		btnConnect.setSize(new Dimension(112, 25));
 		btnConnect.setEnabled(false);
 		btnConnect.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnConnect.setName("btnConnect");
@@ -116,6 +126,8 @@ public class ClientSwingView extends JFrame implements ClientView {
 			});
 		
 		txtUsername = new JTextField();
+		txtUsername.setPreferredSize(new Dimension(112, 19));
+		txtUsername.setMinimumSize(new Dimension(112, 19));
 		txtUsername.setName("txtUsername");
 		KeyAdapter txtUsernameEvents = new KeyAdapter() {
 			@Override
@@ -133,12 +145,13 @@ public class ClientSwingView extends JFrame implements ClientView {
 		verticalStrut = Box.createVerticalStrut(20);
 		verticalStrut.setMaximumSize(new Dimension(32767, 10));
 		verticalBox.add(verticalStrut);
-		btnConnect.setPreferredSize(new Dimension(80, 25));
+		btnConnect.setPreferredSize(new Dimension(112, 25));
 		btnConnect.setMinimumSize(new Dimension(112, 25));
 		btnConnect.setMaximumSize(new Dimension(112, 25));
 		verticalBox.add(btnConnect);
 		
 		btnDisconnect = new JButton("Disconnect");
+		btnDisconnect.setSize(new Dimension(112, 25));
 		btnDisconnect.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnDisconnect.addActionListener(e -> {
 			client.disconnect();
@@ -154,14 +167,27 @@ public class ClientSwingView extends JFrame implements ClientView {
 		verticalStrut_1.setMaximumSize(new Dimension(32767, 5));
 		verticalBox.add(verticalStrut_1);
 		btnDisconnect.setName("btnDisconnect");
-		btnDisconnect.setPreferredSize(new Dimension(80, 25));
 		verticalBox.add(btnDisconnect);
 		btnDisconnect.setEnabled(false);
+		
+		verticalStrut_2 = Box.createVerticalStrut(20);
+		verticalBox.add(verticalStrut_2);
+		
+		txtErrorMessage = new JTextPane();
+		txtErrorMessage.setMaximumSize(new Dimension(112, 200));
+		txtErrorMessage.setPreferredSize(new Dimension(112, 0));
+		txtErrorMessage.setMinimumSize(new Dimension(112, 0));
+		txtErrorMessage.setRequestFocusEnabled(false);
+		txtErrorMessage.setEditable(false);
+		txtErrorMessage.setFocusable(false);
+		txtErrorMessage.setForeground(Color.RED);
+		txtErrorMessage.setFont(new Font("Dialog", Font.BOLD, 12));
+		txtErrorMessage.setOpaque(false);
+		verticalBox.add(txtErrorMessage);
 		
 		scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
-		gbc_scrollPane.gridheight = 2;
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_scrollPane.gridx = 1;
 		gbc_scrollPane.gridy = 1;
@@ -172,8 +198,6 @@ public class ClientSwingView extends JFrame implements ClientView {
 		msgsBoard.setEnabled(false);
 		msgsBoard.setEditable(false);
 		msgsBoard.setName("msgsTextPane");
-		
-		txtMessage = new JTextField();
 		KeyAdapter txtMessageEvents = new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -195,6 +219,8 @@ public class ClientSwingView extends JFrame implements ClientView {
 				}
 			}
 		};
+		
+		txtMessage = new JTextField();
 		txtMessage.addKeyListener(txtMessageEvents);
 		txtMessage.setEnabled(false);
 		txtMessage.setName("txtMessage");
@@ -202,7 +228,7 @@ public class ClientSwingView extends JFrame implements ClientView {
 		gbc_txtMessage.insets = new Insets(0, 0, 5, 0);
 		gbc_txtMessage.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtMessage.gridx = 1;
-		gbc_txtMessage.gridy = 3;
+		gbc_txtMessage.gridy = 2;
 		contentPane.add(txtMessage, gbc_txtMessage);
 		txtMessage.setColumns(10);
 		
@@ -218,9 +244,8 @@ public class ClientSwingView extends JFrame implements ClientView {
 		});
 		btnSend.setEnabled(false);
 		GridBagConstraints gbc_btnSend = new GridBagConstraints();
-		gbc_btnSend.insets = new Insets(0, 0, 5, 0);
 		gbc_btnSend.gridx = 1;
-		gbc_btnSend.gridy = 4;
+		gbc_btnSend.gridy = 3;
 		contentPane.add(btnSend, gbc_btnSend);
 	}
 
