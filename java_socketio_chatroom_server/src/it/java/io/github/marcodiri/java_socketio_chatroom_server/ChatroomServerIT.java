@@ -66,8 +66,8 @@ public class ChatroomServerIT {
 
     @Test
     public void testClientJoinRetrievesMessagesFromMongoDb() {
-        ServerMessage msg1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
-        ServerMessage msg2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
+        ServerMessage msg1 = new ServerMessage(new Timestamp(0), "user1", "message1");
+        ServerMessage msg2 = new ServerMessage(new Timestamp(1), "user2", "message2");
         serverRepository.save(msg1);
         serverRepository.save(msg2);
 
@@ -90,8 +90,8 @@ public class ChatroomServerIT {
 
     @Test
     public void testMessagesAreSavedInMongoDb() {
-        ServerMessage originalMessage1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
-        ServerMessage originalMessage2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
+        ServerMessage originalMessage1 = new ServerMessage(new Timestamp(0), "user1", "message1");
+        ServerMessage originalMessage2 = new ServerMessage(new Timestamp(1), "user2", "message2");
 
         clientSocket.on(Socket.EVENT_CONNECT, objects -> {
             clientSocket.emit("join");

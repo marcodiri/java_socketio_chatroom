@@ -58,8 +58,8 @@ public class ChatroomServerTest {
     @Test
     public void testClientJoinRetrievesMessagesFromDb() {
         List<Message> history = new ArrayList<>();
-        ServerMessage msg1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
-        ServerMessage msg2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
+        ServerMessage msg1 = new ServerMessage(new Timestamp(0), "user1", "message1");
+        ServerMessage msg2 = new ServerMessage(new Timestamp(1), "user2", "message2");
         history.add(msg1);
         history.add(msg2);
         when(serverRepository.findAll()).thenReturn(history);
@@ -98,8 +98,8 @@ public class ChatroomServerTest {
 
     @Test
     public void testClientReceivesItsMessages() {
-        ServerMessage originalMessage1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
-        ServerMessage originalMessage2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
+        ServerMessage originalMessage1 = new ServerMessage(new Timestamp(0), "user1", "message1");
+        ServerMessage originalMessage2 = new ServerMessage(new Timestamp(1), "user2", "message2");
 
         when(serverRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -125,8 +125,8 @@ public class ChatroomServerTest {
 
     @Test
     public void testMessagesAreSavedInDb() {
-        ServerMessage originalMessage1 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user1", "message1");
-        ServerMessage originalMessage2 = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user2", "message2");
+        ServerMessage originalMessage1 = new ServerMessage(new Timestamp(0), "user1", "message1");
+        ServerMessage originalMessage2 = new ServerMessage(new Timestamp(1), "user2", "message2");
 
         when(serverRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -199,7 +199,7 @@ public class ChatroomServerTest {
         AtomicBoolean msgReceived = new AtomicBoolean(false);
 
         clientSocket.on(Socket.EVENT_CONNECT, objects -> {
-            Message msg = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
+            Message msg = new ServerMessage(new Timestamp(0), "user", "message");
             clientSocket.emit("msg", msg.toJSON());
         });
         clientSocket.on("msg", arg -> msgReceived.set(true));

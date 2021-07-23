@@ -50,8 +50,8 @@ public class ServerMongoRepositoryIT {
 
 	@Test
 	public void testFindAll() {
-		Timestamp ts1 = new Timestamp(System.currentTimeMillis());
-		Timestamp ts2 = new Timestamp(System.currentTimeMillis());
+		Timestamp ts1 = new Timestamp(0);
+		Timestamp ts2 = new Timestamp(1);
 		
 		messagesCollection.insertMany(asList(
 				new Document()
@@ -73,7 +73,7 @@ public class ServerMongoRepositoryIT {
 	
 	@Test
 	public void testSave() {
-		ServerMessage msg = new ServerMessage(new Timestamp(System.currentTimeMillis()), "user", "message");
+		ServerMessage msg = new ServerMessage(new Timestamp(0), "user", "message");
 		serverRepository.save(msg);
 		assertThat(readAllMessages()).containsExactly(msg);
 	}
