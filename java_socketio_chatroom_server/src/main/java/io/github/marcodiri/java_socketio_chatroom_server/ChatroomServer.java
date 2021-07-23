@@ -53,7 +53,7 @@ public class ChatroomServer {
     private void handleClientJoin(SocketIoSocket socket) {
         socket.on("join", arg -> {
             if (!socketIsInRoom(socket)) {
-                if (usernameList.containsValue((String) arg[0])) {
+                if (usernameList.containsValue(arg[0].toString())) {
                     sendError(socket, "Username is already taken");
                 } else {
                     socket.joinRoom(CHATROOM_NAME);
