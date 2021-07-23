@@ -10,4 +10,9 @@ public final class ServerMessage extends Message {
         super(timestamp, user, message);
 	}
 
+	@Override
+	public String getFormattedMessage() {
+		return this.getTimestamp().toString() + " " + this.getUser() + ": " + this.getUserMessage();
+	}
+
 }
