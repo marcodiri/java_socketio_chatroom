@@ -63,6 +63,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         window.label(JLabelMatcher.withText("Messages"));
         window.textBox("txtUsername").requireEnabled();
         window.textBox("txtMessage").requireDisabled();
+        window.textBox("txtErrorMessage").requireNotEditable();
         window.button(JButtonMatcher.withText("Send")).requireDisabled();
         window.button(JButtonMatcher.withText("Connect")).requireDisabled();
         window.button(JButtonMatcher.withText("Disconnect")).requireDisabled();
@@ -93,14 +94,29 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
     }
 
     @Test
-    public void testConnectBtnDisablesItselfAndTxtUsernameAndConnectsToServer() {
+    public void testShowError() {
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
+
+        clientSwingView.showError("Error!");
+        try {
+            await().atMost(2, SECONDS).untilAsserted(() -> assertThat(txtErrorMessage.text()).isEqualTo("Error!"));
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Expected [Error!] but got [" + txtErrorMessage.text() + "]");
+        }
+    }
+
+    @Test
+    public void testConnectBtnDisablesItselfAndTxtUsernameAndConnectsToServerAndResetErrorMessage() {
         JButtonFixture btnConnect = window.button(JButtonMatcher.withText("Connect"));
         JTextComponentFixture txtUsername = window.textBox("txtUsername");
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
 
         setEnabled(btnConnect.target(), true);
+        txtErrorMessage.setText("Error!");
         btnConnect.click();
         btnConnect.requireDisabled();
         txtUsername.requireDisabled();
+        txtErrorMessage.requireEmpty();
         verify(client).connect();
     }
 
