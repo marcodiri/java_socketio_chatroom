@@ -53,7 +53,7 @@ public class ChatroomClientTest {
 
 	@Test
 	public void testConnect() {
-		client.connect();
+		client.connect("user");
 		try {
 			await().atMost(2, SECONDS).untilTrue(serverMock.socketIsInRoom());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {

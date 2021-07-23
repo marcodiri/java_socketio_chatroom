@@ -125,7 +125,7 @@ public class ClientSwingView extends JFrame implements ClientView {
             btnConnect.setEnabled(false);
             txtUsername.setEnabled(false);
             txtErrorMessage.setText("");
-            client.connect();
+            client.connect(txtUsername.getText());
         });
 
         txtUsername = new JTextField();

@@ -113,11 +113,12 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
 
         setEnabled(btnConnect.target(), true);
         txtErrorMessage.setText("Error!");
+        txtUsername.setText("User");
         btnConnect.click();
         btnConnect.requireDisabled();
         txtUsername.requireDisabled();
         txtErrorMessage.requireEmpty();
-        verify(client).connect();
+        verify(client).connect("User");
     }
 
     @Test
