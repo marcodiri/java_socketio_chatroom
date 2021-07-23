@@ -226,7 +226,7 @@ public class ClientSwingView extends JFrame implements ClientView {
 
 	@Override
 	public void addMessage(Message msg) {
-		msgsBoard.newMessageNotify(msg);
+		SwingUtilities.invokeLater(() -> msgsBoard.newMessageNotify(msg));
 	}
 
 	@Override
