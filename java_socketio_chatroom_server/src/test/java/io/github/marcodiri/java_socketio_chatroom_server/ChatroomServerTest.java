@@ -11,6 +11,7 @@ import org.junit.*;
 import org.mockito.*;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.net.URI;
@@ -21,8 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 
 public class ChatroomServerTest {
@@ -87,7 +86,7 @@ public class ChatroomServerTest {
             fail("Expected " + asList(msg1, msg2) + " but got " + retrievedMessages);
         }
         verify(serverRepository, times(1)).findAll();
-        assertThat(chatroomServer.getUsernameList()).containsValue("user");
+        assertThat(chatroomServer.getUsernameList()).containsExactly(entry(clientSocket.id(),"user"));
     }
 
     @Test
@@ -226,9 +225,9 @@ public class ChatroomServerTest {
         when(serverRepository.findAll()).thenReturn(new ArrayList<>());
 
         clientSocket.on(Socket.EVENT_CONNECT, objects -> {
-            clientSocket.emit("join", "user");
+            clientSocket.emit("join", "user1");
 
-            clientSocket.emit("join", "user");
+            clientSocket.emit("join", "user2");
         });
         clientSocket.connect();
 
