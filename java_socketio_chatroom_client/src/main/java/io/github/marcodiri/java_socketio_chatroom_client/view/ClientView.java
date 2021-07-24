@@ -6,4 +6,6 @@ public interface ClientView {
     public void addMessage(Message msg);
     
     public void roomJoined(String roomName);
+
+    public void showError(String errorMsg);
 }

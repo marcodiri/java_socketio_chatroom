@@ -1,6 +1,7 @@
 package io.github.marcodiri.java_socketio_chatroom_client;
 
 import java.net.URI;
+
 import org.json.JSONObject;
 
 import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
@@ -11,49 +12,49 @@ import io.socket.client.Socket;
 
 public class ChatroomClient {
 
-	private final Socket socket;
-	
-	private final ClientView view;
+    private final Socket socket;
 
-	public ChatroomClient(URI uri, Options options, ClientView view) {
-		this.socket = IO.socket(uri, options);
-		this.view = view;
-	}
+    private final ClientView view;
 
-	public Socket getSocket() {
-		return socket;
-	}
+    public ChatroomClient(URI uri, Options options, ClientView view) {
+        this.socket = IO.socket(uri, options);
+        this.view = view;
+    }
 
-	public boolean isConnected() {
-		return socket.connected();
-	}
+    public Socket getSocket() {
+        return socket;
+    }
 
-	public void connect() {
-		socket.on(Socket.EVENT_CONNECT, objects -> {
-			handleJoin();
-			socket.emit("join");
-			handleMessage();
-		});
-		socket.connect();
-	}
+    public boolean isConnected() {
+        return socket.connected();
+    }
 
-	public void disconnect() {
-		socket.disconnect();
-	}
+    public void connect(String username) {
+        socket.on(Socket.EVENT_CONNECT, objects -> {
+            handleJoin();
+            socket.emit("join", username);
+            handleMessage();
+        });
+        socket.connect();
+    }
 
-	public void sendMessage(ClientMessage msg) throws RuntimeException {
-		if (isConnected()) {
-			socket.emit("msg", msg.toJSON());
-		} else {
-			throw new RuntimeException("Unable to send message when not connected to server");
-		}
-	}
+    public void disconnect() {
+        socket.disconnect();
+    }
 
-	void handleMessage() {
-		socket.on("msg",arg -> view.addMessage(new ClientMessage((JSONObject) arg[0])));
-	}
+    public void sendMessage(ClientMessage msg) throws RuntimeException {
+        if (isConnected()) {
+            socket.emit("msg", msg.toJSON());
+        } else {
+            throw new RuntimeException("Unable to send message when not connected to server");
+        }
+    }
 
-	void handleJoin() {
-		socket.on("joined", args -> view.roomJoined(((JSONObject) args[0]).getString("roomName")));
-	}
+    void handleMessage() {
+        socket.on("msg", arg -> view.addMessage(new ClientMessage((JSONObject) arg[0])));
+    }
+
+    void handleJoin() {
+        socket.on("joined", args -> view.roomJoined(((JSONObject) args[0]).getString("roomName")));
+    }
 }

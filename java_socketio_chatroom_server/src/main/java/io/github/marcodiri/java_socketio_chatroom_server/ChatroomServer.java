@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class ChatroomServer {
@@ -21,10 +22,13 @@ public class ChatroomServer {
     private final SocketIoNamespace namespace;
     private final ServerRepository repository;
 
+    private final HashMap<String, String> usernameList;
+
     public ChatroomServer(ServerRepository repository) {
         this.serverWrapper = new ServerWrapper();
         this.namespace = serverWrapper.getSocketIoServer().namespace("/");
         this.repository = repository;
+        this.usernameList = new HashMap<>();
     }
 
     public void start() throws Exception {
@@ -34,6 +38,7 @@ public class ChatroomServer {
 
     public void stop() throws Exception {
         serverWrapper.stopServer();
+        usernameList.clear();
     }
 
     private void handleConnections() {
@@ -48,11 +53,16 @@ public class ChatroomServer {
     private void handleClientJoin(SocketIoSocket socket) {
         socket.on("join", arg -> {
             if (!socketIsInRoom(socket)) {
-                socket.joinRoom(CHATROOM_NAME);
-                socket.send("joined", new JSONObject("{roomName: " + CHATROOM_NAME + "}"));
-                List<Message> history = repository.findAll();
-                for (Message message : history) {
-                    socket.send("msg", message.toJSON());
+                if (usernameList.containsValue(arg[0].toString())) {
+                    sendError(socket, "Username is already taken");
+                } else {
+                    socket.joinRoom(CHATROOM_NAME);
+                    usernameList.put(socket.getId(), (String) arg[0]);
+                    socket.send("joined", new JSONObject("{roomName: " + CHATROOM_NAME + "}"));
+                    List<Message> history = repository.findAll();
+                    for (Message message : history) {
+                        socket.send("msg", message.toJSON());
+                    }
                 }
             }
         });
@@ -70,15 +80,26 @@ public class ChatroomServer {
     }
 
     private void handleClientLeave(SocketIoSocket socket) {
-        socket.on("leave", arg -> socket.leaveRoom(CHATROOM_NAME));
+        socket.on("disconnect", arg -> {
+            socket.leaveRoom(CHATROOM_NAME);
+            usernameList.remove(socket.getId());
+        });
     }
 
     SocketIoNamespace getNamespace() {
         return namespace;
     }
 
+    HashMap<String, String> getUsernameList() {
+        return usernameList;
+    }
+
     private boolean socketIsInRoom(SocketIoSocket socket) {
         return Arrays.asList(namespace.getAdapter().listClientRooms(socket)).contains(CHATROOM_NAME);
+    }
+
+    private void sendError(SocketIoSocket socket, String errorMessage) {
+        socket.send("error", new JSONObject("{message: " + errorMessage + "}"));
     }
 
 }
