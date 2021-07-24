@@ -258,7 +258,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
     }
 
     @Test
-    public void testBtnSendSendsMessageAndClearsTxtMessage() {
+    public void testBtnSendSendsMessageAndClearsTxtMessageAndDisablesItself() {
         JTextComponentFixture txtUsername = window.textBox("txtUsername");
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
         JButtonFixture btnSend = window.button(JButtonMatcher.withText("Send"));
@@ -276,6 +276,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         btnSend.click();
         verify(client).sendMessage(captor.capture());
         txtMessage.requireEmpty();
+        btnSend.requireDisabled();
 
         assertThat(captor.getValue().getUser()).isEqualTo(username);
         assertThat(captor.getValue().getUserMessage()).isEqualTo(message);

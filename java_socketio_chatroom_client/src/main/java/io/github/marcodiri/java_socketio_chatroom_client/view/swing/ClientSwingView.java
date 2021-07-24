@@ -243,6 +243,7 @@ public class ClientSwingView extends JFrame implements ClientView {
             );
             client.sendMessage(msg);
             txtMessage.setText("");
+            btnSend.setEnabled(false);
         });
         btnSend.setEnabled(false);
         GridBagConstraints gbc_btnSend = new GridBagConstraints();
