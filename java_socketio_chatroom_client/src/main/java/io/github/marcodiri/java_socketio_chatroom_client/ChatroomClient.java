@@ -39,6 +39,7 @@ public class ChatroomClient {
     }
 
     public void disconnect() {
+        socket.on(Socket.EVENT_DISCONNECT, objects -> socket.off());
         socket.disconnect();
     }
 

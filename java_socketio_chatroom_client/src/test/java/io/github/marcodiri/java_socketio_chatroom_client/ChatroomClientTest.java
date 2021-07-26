@@ -65,6 +65,26 @@ public class ChatroomClientTest {
 	}
 
 	@Test
+	public void testDisconnect() {
+		client.getSocket().connect();
+		try {
+			await().atMost(2, SECONDS).until(() -> client.isConnected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Cannot connect to server");
+		}
+
+		client.disconnect();
+		try {
+			await().atMost(2, SECONDS).until(() -> !client.isConnected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Cannot disconnect from server");
+		}
+
+		assertThat(client.getSocket().hasListeners("msg")).isFalse();
+		assertThat(client.getSocket().hasListeners("joined")).isFalse();
+	}
+
+	@Test
 	public void testSendMessageWhenClientNotConnected() {
 		ClientMessage msg = new ClientMessage(new Timestamp(0), "user", "message");
 
