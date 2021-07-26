@@ -49,26 +49,6 @@ public class ClientSwingView extends JFrame implements ClientView {
     private Component verticalStrut_2;
     private JTextPane txtErrorMessage;
 
-
-    /**
-     * Launch the application.
-     */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					MessageBoard board = new MessageBoard();
-//					ClientSwingView frame = new ClientSwingView(board);
-//					ChatroomClient client = new ChatroomClient(URI.create("http://localhost:3000"), IO.Options.builder().build(), frame);
-//					frame.setClient(client);
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-
     /**
      * Create the frame.
      *
