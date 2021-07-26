@@ -72,8 +72,10 @@ public class MessageBoardTest {
     @Test
     public void testClearBoard() {
         board.setText("Text");
+        board.getHistory().add(new ClientMessage(new Timestamp(0), "user", "message"));
         board.clearBoard();
         assertThat(board.getText()).isEmpty();
+        assertThat(board.getHistory().isEmpty()).isTrue();
     }
 
 }

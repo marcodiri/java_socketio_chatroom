@@ -142,7 +142,7 @@ public class ClientSwingView extends JFrame implements ClientView {
             btnConnect.setEnabled(true);
             txtMessage.setEnabled(false);
             msgsBoard.setEnabled(false);
-            msgsBoard.setText("");
+            msgsBoard.clearBoard();
             txtUsername.setEnabled(true);
         });
 

@@ -13,7 +13,7 @@ public class MessageBoard extends JTextPane {
 
     private final transient List<Message> history = new ArrayList<>();
 
-    public List<Message> getHistory() {
+    List<Message> getHistory() {
         return history;
     }
 
@@ -32,6 +32,7 @@ public class MessageBoard extends JTextPane {
 
     public void clearBoard() {
         setText("");
+        history.clear();
     }
 
 }
