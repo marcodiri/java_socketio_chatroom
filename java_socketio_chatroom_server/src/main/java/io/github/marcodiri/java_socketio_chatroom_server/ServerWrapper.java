@@ -1,5 +1,6 @@
 package io.github.marcodiri.java_socketio_chatroom_server;
 
+import io.socket.engineio.server.EngineIoServerOptions;
 import org.eclipse.jetty.http.pathmap.ServletPathSpec;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -29,7 +30,7 @@ public class ServerWrapper {
     ServerWrapper() {
 
         mServer = new Server(3000);
-        mEngineIoServer = new EngineIoServer();
+        mEngineIoServer = new EngineIoServer(EngineIoServerOptions.newFromDefault().setPingTimeout(30000));
         mSocketIoServer = new SocketIoServer(mEngineIoServer);
 
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
