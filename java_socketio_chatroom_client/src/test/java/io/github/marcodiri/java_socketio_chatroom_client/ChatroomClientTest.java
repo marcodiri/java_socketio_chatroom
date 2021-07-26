@@ -66,6 +66,8 @@ public class ChatroomClientTest {
 
 	@Test
 	public void testDisconnect() {
+		client.handleJoin();
+		client.handleMessage();
 		client.getSocket().connect();
 		try {
 			await().atMost(2, SECONDS).until(() -> client.isConnected());
