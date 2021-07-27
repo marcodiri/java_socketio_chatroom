@@ -28,6 +28,8 @@ public abstract class Message {
 		return userMessage;
 	}
 
+	public abstract String getFormattedMessage();
+
 	public JSONObject toJSON() {
         JSONObject obj = new JSONObject();
 

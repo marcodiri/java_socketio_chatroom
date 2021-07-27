@@ -18,6 +18,7 @@
 	<properties>
 		<socketIO.version>2.0.1</socketIO.version>
 		<socketServerMock.version>0.0.1-SNAPSHOT</socketServerMock.version>
+		<assertjSwing.version>3.17.1</assertjSwing.version>
 
 		<sonar.coverage.exclusions>
 			**/model/*.*,
@@ -50,6 +51,12 @@
 				<version>${project.version}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-swing-junit</artifactId>
+				<version>${assertjSwing.version}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -69,6 +76,10 @@
 		<dependency>
 			<groupId>io.github.marcodiri</groupId>
 			<artifactId>java_socketio_chatroom_server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-swing-junit</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -113,6 +124,10 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -156,10 +171,15 @@
 							<excludedClasses>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.model.*</param>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.App</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_client.view.ClientView</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_client.view.swing.ClientSwingView*</param>
 							</excludedClasses>
 							<targetTests>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.*Test</param>
 							</targetTests>
+							<excludedTestClasses>
+								<param>io.github.marcodiri.java_socketio_chatroom_client.view.swing.ClientSwingViewTest</param>
+							</excludedTestClasses>
 						</configuration>
 						<executions>
 							<execution>

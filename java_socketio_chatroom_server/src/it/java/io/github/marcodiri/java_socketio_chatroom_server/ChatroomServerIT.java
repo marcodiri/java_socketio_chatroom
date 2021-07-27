@@ -77,7 +77,7 @@ public class ChatroomServerIT {
             ServerMessage incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
             retrievedMessages.add(incomingMessage);
         });
-        clientSocket.on(Socket.EVENT_CONNECT, objects -> clientSocket.emit("join"));
+        clientSocket.on(Socket.EVENT_CONNECT, objects -> clientSocket.emit("join", "user"));
         clientSocket.connect();
 
         try {
@@ -94,7 +94,7 @@ public class ChatroomServerIT {
         ServerMessage originalMessage2 = new ServerMessage(new Timestamp(1), "user2", "message2");
 
         clientSocket.on(Socket.EVENT_CONNECT, objects -> {
-            clientSocket.emit("join");
+            clientSocket.emit("join", "user");
             clientSocket.emit("msg", originalMessage1.toJSON());
             clientSocket.emit("msg", originalMessage2.toJSON());
         });

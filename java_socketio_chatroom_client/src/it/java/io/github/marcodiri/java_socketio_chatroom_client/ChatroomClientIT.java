@@ -7,7 +7,6 @@ import io.github.marcodiri.java_socketio_chatroom_server.ChatroomServer;
 import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
 import io.socket.client.IO;
-import io.socket.client.Socket;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +58,7 @@ public class ChatroomClientIT {
         Message serverMessage = new ServerMessage(new Timestamp(0), "user", "message");
         when(mongoRepository.findAll()).thenReturn(Collections.singletonList(serverMessage));
 
-        chatroomClient.connect();
+        chatroomClient.connect("user");
 
         Message clientMessage = new ClientMessage(serverMessage.toJSON());
         try {
@@ -71,7 +70,7 @@ public class ChatroomClientIT {
 
     @Test
     public void testSentMessageAreSavedInRepository() {
-        chatroomClient.connect();
+        chatroomClient.connect("user");
         try {
             await().atMost(2, SECONDS).until(() -> chatroomClient.isConnected());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {

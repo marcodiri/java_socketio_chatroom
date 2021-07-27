@@ -53,16 +53,38 @@ public class ChatroomClientTest {
 
 	@Test
 	public void testConnect() {
-		client.connect();
+		client.connect("user");
 		try {
 			await().atMost(2, SECONDS).untilTrue(serverMock.socketIsInRoom());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Socket could not join the room");
 		}
 		
-		verify(view).connectedToServer();
 		assertThat(client.getSocket().hasListeners("msg")).isTrue();
 		assertThat(client.getSocket().hasListeners("joined")).isTrue();
+		assertThat(client.getSocket().hasListeners("error")).isTrue();
+	}
+
+	@Test
+	public void testDisconnect() {
+		client.getSocket().on("event1", args -> {});
+		client.getSocket().on("event2", args -> {});
+		client.getSocket().connect();
+		try {
+			await().atMost(2, SECONDS).until(() -> client.isConnected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Cannot connect to server");
+		}
+
+		client.disconnect();
+		try {
+			await().atMost(2, SECONDS).until(() -> !client.isConnected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Cannot disconnect from server");
+		}
+
+		assertThat(client.getSocket().hasListeners("event1")).isFalse();
+		assertThat(client.getSocket().hasListeners("event2")).isFalse();
 	}
 
 	@Test
@@ -142,9 +164,29 @@ public class ChatroomClientTest {
 		try {
 			await().atMost(2, SECONDS).untilAsserted(() -> verify(view).roomJoined("RoomName"));
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("RoomJoined on ClientView was not called");
+			fail("roomJoined on ClientView was not called");
 		}
 
+	}
+
+	@Test
+	public void testHandleError() {
+		client.getSocket().connect();
+		client.handleError();
+		try {
+			await().atMost(2, SECONDS).until(() -> client.isConnected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Client could not connect to server");
+		}
+
+		String errorMessage = "Username is already taken";
+		serverMock.sendEvent("error", new JSONObject("{message: " + errorMessage + "}"));
+
+		try {
+			await().atMost(2, SECONDS).untilAsserted(() -> verify(view).showError(errorMessage));
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("showError on ClientView was not called or message is invalid");
+		}
 	}
 
 }
