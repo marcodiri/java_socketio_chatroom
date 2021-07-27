@@ -62,6 +62,7 @@ public class ChatroomClientTest {
 		
 		assertThat(client.getSocket().hasListeners("msg")).isTrue();
 		assertThat(client.getSocket().hasListeners("joined")).isTrue();
+		assertThat(client.getSocket().hasListeners("error")).isTrue();
 	}
 
 	@Test
@@ -84,6 +85,7 @@ public class ChatroomClientTest {
 
 		assertThat(client.getSocket().hasListeners("msg")).isFalse();
 		assertThat(client.getSocket().hasListeners("joined")).isFalse();
+		assertThat(client.getSocket().hasListeners("error")).isFalse();
 	}
 
 	@Test
@@ -163,9 +165,29 @@ public class ChatroomClientTest {
 		try {
 			await().atMost(2, SECONDS).untilAsserted(() -> verify(view).roomJoined("RoomName"));
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("RoomJoined on ClientView was not called");
+			fail("roomJoined on ClientView was not called");
 		}
 
+	}
+
+	@Test
+	public void testHandleError() {
+		client.getSocket().connect();
+		client.handleError();
+		try {
+			await().atMost(2, SECONDS).until(() -> client.isConnected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Client could not connect to server");
+		}
+
+		String errorMessage = "Username is already taken";
+		serverMock.sendEvent("error", new JSONObject("{message: " + errorMessage + "}"));
+
+		try {
+			await().atMost(2, SECONDS).untilAsserted(() -> verify(view).showError(errorMessage));
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("showError on ClientView was not called or message is invalid");
+		}
 	}
 
 }

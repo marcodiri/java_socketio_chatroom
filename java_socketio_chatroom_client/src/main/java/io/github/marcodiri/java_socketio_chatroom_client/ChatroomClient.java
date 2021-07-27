@@ -34,6 +34,7 @@ public class ChatroomClient {
             handleJoin();
             socket.emit("join", username);
             handleMessage();
+            handleError();
         });
         socket.connect();
     }
@@ -57,5 +58,9 @@ public class ChatroomClient {
 
     void handleJoin() {
         socket.on("joined", args -> view.roomJoined(((JSONObject) args[0]).getString("roomName")));
+    }
+
+    void handleError() {
+        socket.on("error", args -> view.showError(((JSONObject) args[0]).getString("message")));
     }
 }
