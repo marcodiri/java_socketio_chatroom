@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChatroomServer {
 
@@ -90,7 +91,7 @@ public class ChatroomServer {
         return namespace;
     }
 
-    public HashMap<String, String> getUsernameList() {
+    public Map<String, String> getUsernameList() {
         return usernameList;
     }
 

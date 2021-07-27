@@ -40,7 +40,7 @@ public class ClientSwingView extends JFrame implements ClientView {
     private Component verticalStrut_2;
     private JTextPane txtErrorMessage;
 
-    ViewSnapshot snapshot;
+    transient ViewSnapshot snapshot;
 
     /**
      * Create the frame.
