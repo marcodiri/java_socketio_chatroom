@@ -96,12 +96,18 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
     @Test
     public void testShowError() {
         JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
+        clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
 
         clientSwingView.showError("Error!");
         try {
             await().atMost(2, SECONDS).untilAsserted(() -> assertThat(txtErrorMessage.text()).isEqualTo("Error!"));
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Expected [Error!] but got [" + txtErrorMessage.text() + "]");
+        }
+        try {
+            await().atMost(2, SECONDS).untilAsserted(() -> verify(clientSwingView.snapshot).restore());
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("restore not called");
         }
     }
 
@@ -119,6 +125,23 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         txtUsername.requireDisabled();
         txtErrorMessage.requireEmpty();
         verify(client).connect("User");
+    }
+
+    @Test
+    public void testConnectBtnSavesPreviousState() {
+        JButtonFixture btnConnect = window.button(JButtonMatcher.withText("Connect"));
+        JTextComponentFixture txtUsername = window.textBox("txtUsername");
+
+        setEnabled(btnConnect.target(), true);
+        btnConnect.click();
+        SwingUtilities.invokeLater(() -> clientSwingView.snapshot.restore());
+        try {
+            await().atMost(2, SECONDS).untilAsserted(() -> btnConnect.requireEnabled());
+            await().atMost(2, SECONDS).untilAsserted(() -> txtUsername.requireEnabled());
+            await().atMost(2, SECONDS).untilAsserted(() -> verify(client).disconnect());
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Previous state not restored");
+        }
     }
 
     @Test

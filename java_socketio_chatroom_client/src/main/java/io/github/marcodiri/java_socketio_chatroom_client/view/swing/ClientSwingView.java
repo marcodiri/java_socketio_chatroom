@@ -1,8 +1,7 @@
 package io.github.marcodiri.java_socketio_chatroom_client.view.swing;
 
 import java.awt.Dimension;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import io.github.marcodiri.java_socketio_chatroom_client.ChatroomClient;
@@ -13,20 +12,12 @@ import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-import javax.swing.JButton;
 import java.awt.Insets;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.Timestamp;
-import javax.swing.JScrollPane;
-import javax.swing.Box;
 import java.awt.Component;
-import javax.swing.JTextPane;
 import java.awt.Font;
 import java.awt.Color;
 
@@ -48,6 +39,8 @@ public class ClientSwingView extends JFrame implements ClientView {
     private Component verticalStrut_1;
     private Component verticalStrut_2;
     private JTextPane txtErrorMessage;
+
+    ViewSnapshot snapshot;
 
     /**
      * Create the frame.
@@ -102,6 +95,12 @@ public class ClientSwingView extends JFrame implements ClientView {
         btnConnect.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnConnect.setName("btnConnect");
         btnConnect.addActionListener(e -> {
+            snapshot = new ViewSnapshot();
+            snapshot.save(() -> {
+                btnConnect.setEnabled(true);
+                txtUsername.setEnabled(true);
+                client.disconnect();
+            });
             btnConnect.setEnabled(false);
             txtUsername.setEnabled(false);
             txtErrorMessage.setText("");
@@ -248,10 +247,25 @@ public class ClientSwingView extends JFrame implements ClientView {
 
     @Override
     public void showError(String errorMsg) {
-        SwingUtilities.invokeLater(() -> txtErrorMessage.setText(errorMsg));
+        SwingUtilities.invokeLater(() -> {
+            txtErrorMessage.setText(errorMsg);
+            snapshot.restore();
+        });
     }
 
     public void setClient(ChatroomClient client) {
         this.client = client;
+    }
+
+    class ViewSnapshot {
+        private Runnable snapshot;
+
+        void save(Runnable runnable) {
+            snapshot = runnable;
+        }
+
+        void restore() {
+            snapshot.run();
+        }
     }
 }
