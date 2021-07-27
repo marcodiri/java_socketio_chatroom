@@ -67,8 +67,8 @@ public class ChatroomClientTest {
 
 	@Test
 	public void testDisconnect() {
-		client.handleJoin();
-		client.handleMessage();
+		client.getSocket().on("event1", args -> {});
+		client.getSocket().on("event2", args -> {});
 		client.getSocket().connect();
 		try {
 			await().atMost(2, SECONDS).until(() -> client.isConnected());
@@ -83,9 +83,8 @@ public class ChatroomClientTest {
 			fail("Cannot disconnect from server");
 		}
 
-		assertThat(client.getSocket().hasListeners("msg")).isFalse();
-		assertThat(client.getSocket().hasListeners("joined")).isFalse();
-		assertThat(client.getSocket().hasListeners("error")).isFalse();
+		assertThat(client.getSocket().hasListeners("event1")).isFalse();
+		assertThat(client.getSocket().hasListeners("event2")).isFalse();
 	}
 
 	@Test
