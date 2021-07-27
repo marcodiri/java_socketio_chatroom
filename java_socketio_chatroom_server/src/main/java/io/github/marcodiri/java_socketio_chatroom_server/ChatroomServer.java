@@ -90,7 +90,7 @@ public class ChatroomServer {
         return namespace;
     }
 
-    HashMap<String, String> getUsernameList() {
+    public HashMap<String, String> getUsernameList() {
         return usernameList;
     }
 
