@@ -86,7 +86,7 @@ public class ChatroomServer {
             LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} to Socket %s", arg[0], socket.getId()));
             if (socketIsInRoom(socket)) {
                 namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
-                LOGGER.info(String.format("Message broadcasted to clients"));
+                LOGGER.info("Message broadcasted to clients");
                 JSONObject jsonMsg = (JSONObject) arg[0];
                 Message incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
                 repository.save(incomingMessage);
@@ -117,7 +117,7 @@ public class ChatroomServer {
 
     private void sendError(SocketIoSocket socket, String errorMessage) {
         socket.send("error", new JSONObject("{message: " + errorMessage + "}"));
-        LOGGER.info(String.format("Sent error [%s] to Socket %s", errorMessage, socket.getId()));
+        LOGGER.info("Sent error [{}] to Socket {}", errorMessage, socket.getId());
         LOGGER.debug(() -> String.format("Sent {event: \"error\", message: \"%s\"} to Socket %s", errorMessage, socket.getId()));
     }
 

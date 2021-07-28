@@ -44,7 +44,7 @@ public class ServerMongoRepository implements ServerRepository {
 				.append("timestamp", message.getTimestamp().getTime())
 				.append("user", message.getUser())
 				.append("message", message.getUserMessage()));
-        LOGGER.info(String.format("Saved %s in db", message.toString()));
+        LOGGER.info("Saved {} in db", message);
 	}
 
 	private Message fromDocumentToMessage(Document d) {

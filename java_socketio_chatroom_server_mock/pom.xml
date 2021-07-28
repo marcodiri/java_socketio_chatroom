@@ -36,6 +36,10 @@
 		</sonar.coverage.exclusions>
     	<aggregate.report.dir>java_socketio_chatroom_report/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
     	<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
+    	
+    	<sonar.cpd.exclusions>
+			**/ServerWrapper.*
+    	</sonar.cpd.exclusions>
 	</properties>
 
 	<dependencyManagement>

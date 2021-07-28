@@ -231,8 +231,8 @@ public class ClientSwingView extends JFrame implements ClientView {
 
     @Override
     public void addMessage(Message msg) {
-    	LOGGER.info(String.format("Adding new Message to board"));
-        LOGGER.debug(() -> msg.toString());
+    	LOGGER.info("Adding new Message to board");
+        LOGGER.debug(msg::toString);
         SwingUtilities.invokeLater(() -> msgsBoard.newMessageNotify(msg));
     }
 

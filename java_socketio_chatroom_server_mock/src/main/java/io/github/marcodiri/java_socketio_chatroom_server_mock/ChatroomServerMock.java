@@ -62,7 +62,7 @@ public class ChatroomServerMock {
 	public void handleEvent(String event, Listener fn) throws NullPointerException {
 		if (socket != null) {
 			socket.on(event, fn);
-			LOGGER.info(String.format("Added listener to server for event: %s", event));
+			LOGGER.info("Added listener to server for event: {}", event);
 		} else {
 			throw new NullPointerException("socket is null");
 		}
@@ -71,7 +71,7 @@ public class ChatroomServerMock {
 	public void sendEvent(String event, JSONObject msg) throws NullPointerException {
         if (socket != null) {
 			socket.send(event, msg);
-			LOGGER.info(String.format("Sent {event: \"%s\", message: \"%s\"} to Socket %s", event, msg, socket.getId()));
+			LOGGER.info("Sent {event: \"{}\", message: \"{}\"} to Socket {}", event, msg, socket.getId());
 		} else {
 			throw new NullPointerException("socket is null");
 		}

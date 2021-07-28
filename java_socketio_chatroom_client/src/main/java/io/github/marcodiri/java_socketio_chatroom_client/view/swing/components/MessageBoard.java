@@ -33,13 +33,13 @@ public class MessageBoard extends JTextPane {
             formattedText.append(m.getFormattedMessage());
         }
         setText(formattedText.toString());
-    	LOGGER.info(String.format("Message added to board"));
+    	LOGGER.info("Message added to board");
     }
 
     public void clearBoard() {
         setText("");
         history.clear();
-    	LOGGER.info(String.format("Board cleared"));
+    	LOGGER.info("Board cleared");
     }
 
 }
