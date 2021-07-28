@@ -1,20 +1,18 @@
 package io.github.marcodiri.java_socketio_chatroom_server_mock;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
-import static org.awaitility.Awaitility.await;
-import java.net.URI;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import io.socket.client.IO;
+import io.socket.client.Socket;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.socket.client.IO;
-import io.socket.client.Socket;
+import java.net.URI;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.*;
+import static org.awaitility.Awaitility.await;
 
 public class ChatroomServerMockTest {
 

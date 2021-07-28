@@ -1,24 +1,25 @@
 package io.github.marcodiri.java_socketio_chatroom_server.repository.mongo;
 
-import static io.github.marcodiri.java_socketio_chatroom_server.repository.mongo.ServerMongoRepository.CHATROOM_DB_NAME;
-import static io.github.marcodiri.java_socketio_chatroom_server.repository.mongo.ServerMongoRepository.MESSAGES_COLLECTION_NAME;
+import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
+import org.bson.Document;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static io.github.marcodiri.java_socketio_chatroom_server.repository.mongo.ServerMongoRepository.CHATROOM_DB_NAME;
+import static io.github.marcodiri.java_socketio_chatroom_server.repository.mongo.ServerMongoRepository.MESSAGES_COLLECTION_NAME;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import org.bson.Document;
-import org.junit.*;
-
-import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-
-import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 
 public class ServerMongoRepositoryIT {
 	private static final int mongoPort = Integer.parseInt(System.getProperty("mongo.port", "27017"));

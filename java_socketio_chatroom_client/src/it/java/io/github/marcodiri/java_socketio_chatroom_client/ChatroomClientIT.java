@@ -10,7 +10,9 @@ import io.socket.client.IO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.net.URI;
 import java.sql.Timestamp;
@@ -19,7 +21,8 @@ import java.util.Collections;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ChatroomClientIT {
 

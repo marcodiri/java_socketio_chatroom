@@ -1,19 +1,9 @@
 package io.github.marcodiri.java_socketio_chatroom_client.view.swing;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.awaitility.Awaitility.await;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-
-import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.sql.Timestamp;
-import javax.swing.SwingUtilities;
-
+import io.github.marcodiri.java_socketio_chatroom_client.ChatroomClient;
+import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
+import io.github.marcodiri.java_socketio_chatroom_client.view.swing.components.MessageBoard;
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.core.matcher.JLabelMatcher;
@@ -26,10 +16,17 @@ import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import io.github.marcodiri.java_socketio_chatroom_client.ChatroomClient;
-import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
-import io.github.marcodiri.java_socketio_chatroom_client.view.swing.components.MessageBoard;
-import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.sql.Timestamp;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.*;
 
 @RunWith(GUITestRunner.class)
 public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {

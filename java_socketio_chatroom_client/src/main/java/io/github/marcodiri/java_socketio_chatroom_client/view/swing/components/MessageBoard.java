@@ -1,12 +1,11 @@
 package io.github.marcodiri.java_socketio_chatroom_client.view.swing.components;
 
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
+
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.swing.JTextPane;
-
-import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 
 @SuppressWarnings("serial")
 public class MessageBoard extends JTextPane {

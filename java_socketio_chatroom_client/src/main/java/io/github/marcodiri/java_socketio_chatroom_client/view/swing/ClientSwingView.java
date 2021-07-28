@@ -1,25 +1,17 @@
 package io.github.marcodiri.java_socketio_chatroom_client.view.swing;
 
-import java.awt.Dimension;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
 import io.github.marcodiri.java_socketio_chatroom_client.ChatroomClient;
 import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
 import io.github.marcodiri.java_socketio_chatroom_client.view.ClientView;
 import io.github.marcodiri.java_socketio_chatroom_client.view.swing.components.MessageBoard;
 import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.Timestamp;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Color;
 
 @SuppressWarnings("serial")
 public class ClientSwingView extends JFrame implements ClientView {

@@ -1,5 +1,8 @@
 package io.github.marcodiri.java_socketio_chatroom_server_mock;
 
+import io.socket.engineio.server.EngineIoServer;
+import io.socket.engineio.server.JettyWebSocketHandler;
+import io.socket.socketio.server.SocketIoServer;
 import org.eclipse.jetty.http.pathmap.ServletPathSpec;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -14,10 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
-import io.socket.engineio.server.EngineIoServer;
-import io.socket.engineio.server.JettyWebSocketHandler;
-import io.socket.socketio.server.SocketIoServer;
 
 
 public class ServerWrapper {

@@ -3,16 +3,16 @@ package io.github.marcodiri.java_socketio_chatroom_server;
 import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
-
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import org.json.JSONObject;
-import org.junit.*;
-import org.mockito.*;
-
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.net.URI;
 import java.sql.Timestamp;
@@ -21,8 +21,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.*;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.*;
 
 public class ChatroomServerTest {
 

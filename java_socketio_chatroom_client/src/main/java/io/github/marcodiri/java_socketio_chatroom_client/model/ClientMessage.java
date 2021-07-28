@@ -1,8 +1,7 @@
 package io.github.marcodiri.java_socketio_chatroom_client.model;
 
-import org.json.JSONObject;
-
 import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
+import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;

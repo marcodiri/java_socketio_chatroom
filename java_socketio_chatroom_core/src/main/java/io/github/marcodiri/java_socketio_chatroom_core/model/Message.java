@@ -1,9 +1,9 @@
 package io.github.marcodiri.java_socketio_chatroom_core.model;
 
+import org.json.JSONObject;
+
 import java.sql.Timestamp;
 import java.util.Objects;
-
-import org.json.JSONObject;
 
 public abstract class Message {
 	protected final Timestamp timestamp;

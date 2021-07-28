@@ -1,16 +1,15 @@
 package io.github.marcodiri.java_socketio_chatroom_client.view.swing.components;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import io.github.marcodiri.java_socketio_chatroom_client.model.ClientMessage;
-import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MessageBoardTest {
 

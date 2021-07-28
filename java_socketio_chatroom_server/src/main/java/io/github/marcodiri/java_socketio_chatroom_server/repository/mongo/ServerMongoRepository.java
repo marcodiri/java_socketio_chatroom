@@ -1,17 +1,16 @@
 package io.github.marcodiri.java_socketio_chatroom_server.repository.mongo;
 
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
+import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
+import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
+import org.bson.Document;
+
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
-import org.bson.Document;
-
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
-import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
 
 public class ServerMongoRepository implements ServerRepository {
 	public static final String CHATROOM_DB_NAME = "chatroom";

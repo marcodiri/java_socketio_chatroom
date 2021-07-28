@@ -3,7 +3,6 @@ package io.github.marcodiri.java_socketio_chatroom_server;
 import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
-
 import io.socket.socketio.server.SocketIoNamespace;
 import io.socket.socketio.server.SocketIoSocket;
 import org.json.JSONObject;
