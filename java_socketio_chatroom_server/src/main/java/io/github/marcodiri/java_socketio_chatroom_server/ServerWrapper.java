@@ -4,6 +4,9 @@ import io.socket.engineio.server.EngineIoServer;
 import io.socket.engineio.server.EngineIoServerOptions;
 import io.socket.engineio.server.JettyWebSocketHandler;
 import io.socket.socketio.server.SocketIoServer;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.http.pathmap.ServletPathSpec;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -25,6 +28,8 @@ public class ServerWrapper {
     private final Server mServer;
     private final EngineIoServer mEngineIoServer;
     private final SocketIoServer mSocketIoServer;
+    
+	private static final Logger LOGGER = LogManager.getLogger(ServerWrapper.class);
 
     ServerWrapper() {
 
@@ -51,6 +56,7 @@ public class ServerWrapper {
                     new ServletPathSpec("/socket.io/*"),
                     (servletUpgradeRequest, servletUpgradeResponse) -> new JettyWebSocketHandler(mEngineIoServer));
         } catch (ServletException ex) {
+        	LOGGER.warn("WebSocket is not available");
         }
 
         HandlerList handlerList = new HandlerList();
