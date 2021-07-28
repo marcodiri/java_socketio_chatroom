@@ -7,8 +7,14 @@ import io.socket.client.IO;
 import java.awt.*;
 import java.net.URI;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class App {
+	private static final Logger LOGGER = LogManager.getLogger(App.class);
+			
     public static void main(String[] args) {
+    	LOGGER.info("Client app started");
         EventQueue.invokeLater(() -> {
             try {
                 MessageBoard board = new MessageBoard();
@@ -17,8 +23,8 @@ public class App {
                 frame.setClient(client);
                 frame.setVisible(true);
             } catch (Exception e) {
-
             }
         });
+    	LOGGER.info("Client app stopped");
     }
 }

@@ -3,6 +3,10 @@ package io.github.marcodiri.java_socketio_chatroom_client.view.swing.components;
 import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 
 import javax.swing.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -11,6 +15,8 @@ import java.util.List;
 public class MessageBoard extends JTextPane {
 
     private final transient List<Message> history = new ArrayList<>();
+    
+    private static final Logger LOGGER = LogManager.getLogger(MessageBoard.class);
 
     List<Message> getHistory() {
         return history;
@@ -27,11 +33,13 @@ public class MessageBoard extends JTextPane {
             formattedText.append(m.getFormattedMessage());
         }
         setText(formattedText.toString());
+    	LOGGER.info("Message added to board");
     }
 
     public void clearBoard() {
         setText("");
         history.clear();
+    	LOGGER.info("Board cleared");
     }
 
 }

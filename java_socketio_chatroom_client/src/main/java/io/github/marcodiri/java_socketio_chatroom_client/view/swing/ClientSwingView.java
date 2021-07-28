@@ -8,6 +8,10 @@ import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -33,6 +37,8 @@ public class ClientSwingView extends JFrame implements ClientView {
     private JTextPane txtErrorMessage;
 
     transient ViewSnapshot snapshot;
+    
+    private static final Logger LOGGER = LogManager.getLogger(ClientSwingView.class);
 
     /**
      * Create the frame.
@@ -225,6 +231,8 @@ public class ClientSwingView extends JFrame implements ClientView {
 
     @Override
     public void addMessage(Message msg) {
+    	LOGGER.info("Adding new Message to board");
+        LOGGER.debug(msg::toString);
         SwingUtilities.invokeLater(() -> msgsBoard.newMessageNotify(msg));
     }
 
@@ -242,6 +250,7 @@ public class ClientSwingView extends JFrame implements ClientView {
         SwingUtilities.invokeLater(() -> {
             txtErrorMessage.setText(errorMsg);
             snapshot.restore();
+            LOGGER.debug(() -> "Restored previous View state");
         });
     }
 
