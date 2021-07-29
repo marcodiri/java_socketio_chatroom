@@ -262,7 +262,7 @@ public class ClientSwingView extends JFrame implements ClientView {
         }
     }
 
-    class ViewSnapshot {
+    static class ViewSnapshot {
         private Runnable snapshot;
 
         void save(Runnable runnable) {

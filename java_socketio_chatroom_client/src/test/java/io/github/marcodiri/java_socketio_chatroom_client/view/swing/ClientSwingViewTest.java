@@ -261,6 +261,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
     public void testTxtMessageSendsMessageWhenTextIsTypedAndEnterIsPressed() {
         JTextComponentFixture txtUsername = window.textBox("txtUsername");
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
 
         clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
 
@@ -269,6 +270,8 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         txtUsername.setText(username);
         setEnabled(txtMessage.target(), true);
         txtMessage.enterText(message);
+        txtErrorMessage.setText("Error!");
+
         txtMessage.pressAndReleaseKeys(KeyEvent.VK_ENTER);
 
         ArgumentCaptor<ClientMessage> captor = ArgumentCaptor.forClass(ClientMessage.class);
@@ -278,6 +281,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
             fail(e.getMessage());
         }
         txtMessage.requireEmpty();
+        txtErrorMessage.requireEmpty();
 
         assertThat(captor.getValue().getUser()).isEqualTo(username);
         assertThat(captor.getValue().getUserMessage()).isEqualTo(message);
@@ -313,6 +317,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         JTextComponentFixture txtUsername = window.textBox("txtUsername");
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
         JButtonFixture btnSend = window.button(JButtonMatcher.withText("Send"));
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
 
         clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
 
@@ -322,6 +327,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         setEnabled(txtMessage.target(), true);
         setEnabled(btnSend.target(), true);
         txtMessage.setText(message);
+        txtErrorMessage.setText("Error!");
 
         ArgumentCaptor<ClientMessage> captor = ArgumentCaptor.forClass(ClientMessage.class);
 
@@ -333,6 +339,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         }
         txtMessage.requireEmpty();
         btnSend.requireDisabled();
+        txtErrorMessage.requireEmpty();
 
         assertThat(captor.getValue().getUser()).isEqualTo(username);
         assertThat(captor.getValue().getUserMessage()).isEqualTo(message);
@@ -345,7 +352,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
         JButtonFixture btnSend = window.button(JButtonMatcher.withText("Send"));
 
-        clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
+        clientSwingView.snapshot = spy(new ClientSwingView.ViewSnapshot());
         doThrow(new SocketException("Unable to send message when not connected to server")).when(client).sendMessage(any(ClientMessage.class));
 
         String username = "Username";
