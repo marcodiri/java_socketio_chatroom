@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.net.SocketException;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Collections;
@@ -81,7 +82,11 @@ public class ChatroomClientIT {
         }
 
         ClientMessage clientMessage = new ClientMessage(new Timestamp(0), "user", "message");
-        chatroomClient.sendMessage(clientMessage);
+        try {
+            chatroomClient.sendMessage(clientMessage);
+        } catch (SocketException e) {
+            fail(e.getMessage());
+        }
 
         Message serverMessage = new ServerMessage(clientMessage.getTimestamp(), clientMessage.getUser(), clientMessage.getUserMessage());
 

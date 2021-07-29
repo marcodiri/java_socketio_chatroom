@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.net.SocketException;
 import java.sql.Timestamp;
 
 @SuppressWarnings("serial")
@@ -37,7 +38,7 @@ public class ClientSwingView extends JFrame implements ClientView {
     private JTextPane txtErrorMessage;
 
     transient ViewSnapshot snapshot;
-    
+
     private static final Logger LOGGER = LogManager.getLogger(ClientSwingView.class);
 
     /**
@@ -193,7 +194,11 @@ public class ClientSwingView extends JFrame implements ClientView {
                             txtUsername.getText(),
                             txtMessage.getText()
                     );
-                    client.sendMessage(msg);
+                    try {
+                        client.sendMessage(msg);
+                    } catch (SocketException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
                     txtMessage.setText("");
                 }
             }
@@ -218,7 +223,11 @@ public class ClientSwingView extends JFrame implements ClientView {
                     txtUsername.getText(),
                     txtMessage.getText()
             );
-            client.sendMessage(msg);
+            try {
+                client.sendMessage(msg);
+            } catch (SocketException ex) {
+                LOGGER.error(ex.getMessage());
+            }
             txtMessage.setText("");
             btnSend.setEnabled(false);
         });
@@ -231,7 +240,7 @@ public class ClientSwingView extends JFrame implements ClientView {
 
     @Override
     public void addMessage(Message msg) {
-    	LOGGER.info("Adding new Message to board");
+        LOGGER.info("Adding new Message to board");
         LOGGER.debug(msg::toString);
         SwingUtilities.invokeLater(() -> msgsBoard.newMessageNotify(msg));
     }

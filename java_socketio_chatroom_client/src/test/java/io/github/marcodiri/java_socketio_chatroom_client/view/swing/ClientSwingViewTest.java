@@ -20,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.net.SocketException;
 import java.sql.Timestamp;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -270,7 +271,11 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         txtMessage.pressAndReleaseKeys(KeyEvent.VK_ENTER);
 
         ArgumentCaptor<ClientMessage> captor = ArgumentCaptor.forClass(ClientMessage.class);
-        verify(client).sendMessage(captor.capture());
+        try {
+            verify(client).sendMessage(captor.capture());
+        } catch (SocketException e) {
+            fail(e.getMessage());
+        }
         txtMessage.requireEmpty();
 
         assertThat(captor.getValue().getUser()).isEqualTo(username);
@@ -294,7 +299,11 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         ArgumentCaptor<ClientMessage> captor = ArgumentCaptor.forClass(ClientMessage.class);
 
         btnSend.click();
-        verify(client).sendMessage(captor.capture());
+        try {
+            verify(client).sendMessage(captor.capture());
+        } catch (SocketException e) {
+            fail(e.getMessage());
+        }
         txtMessage.requireEmpty();
         btnSend.requireDisabled();
 
