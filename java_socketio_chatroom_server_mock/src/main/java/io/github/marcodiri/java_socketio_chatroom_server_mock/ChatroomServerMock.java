@@ -18,8 +18,6 @@ public class ChatroomServerMock {
 
     private SocketIoSocket socket;
 
-    private JSONObject receivedMsg;
-
     private final AtomicBoolean socketIsInRoom = new AtomicBoolean(false);
 
     private static final Logger LOGGER = LogManager.getLogger(ChatroomServerMock.class);
@@ -85,14 +83,6 @@ public class ChatroomServerMock {
 
     public AtomicBoolean socketIsInRoom() {
         return socketIsInRoom;
-    }
-
-    public JSONObject getReceivedMsg() {
-        return receivedMsg;
-    }
-
-    public void setReceivedMsg(JSONObject receivedMsg) {
-        this.receivedMsg = receivedMsg;
     }
 
 

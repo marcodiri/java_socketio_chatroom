@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import java.net.SocketException;
 import java.net.URI;
 import java.sql.Timestamp;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.json.JSONObject;
 import org.junit.After;
@@ -107,8 +108,10 @@ public class ChatroomClientTest {
             fail("Client could not connect to server");
         }
 
+        AtomicReference<JSONObject> receivedMsg = new AtomicReference<>();
+
         try {
-            serverMock.handleEvent("msg", arg -> serverMock.setReceivedMsg((JSONObject) arg[0]));
+            serverMock.handleEvent("msg", arg -> receivedMsg.set((JSONObject) arg[0]));
         } catch (NullPointerException e) {
             fail("Socket is not connected to server");
         }
@@ -121,7 +124,7 @@ public class ChatroomClientTest {
         }
 
         try {
-            await().atMost(2, SECONDS).until(() -> msg.equals(new ClientMessage(serverMock.getReceivedMsg())));
+            await().atMost(2, SECONDS).until(() -> msg.equals(new ClientMessage(receivedMsg.get())));
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Server did not receive the correct message");
         }
