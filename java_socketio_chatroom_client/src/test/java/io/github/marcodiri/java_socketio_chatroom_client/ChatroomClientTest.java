@@ -105,7 +105,7 @@ public class ChatroomClientTest {
 		}
 
 		try {
-			serverMock.handleEvent("msg", arg -> serverMock.receivedMsg = (JSONObject) arg[0]);
+			serverMock.handleEvent("msg", arg -> serverMock.setReceivedMsg((JSONObject) arg[0]));
 		} catch (NullPointerException e) {
 			fail("Socket is not connected to server");
 		}
@@ -118,7 +118,7 @@ public class ChatroomClientTest {
 		}
 
 		try {
-			await().atMost(2, SECONDS).until(() -> msg.equals(new ClientMessage(serverMock.receivedMsg)));
+			await().atMost(2, SECONDS).until(() -> msg.equals(new ClientMessage(serverMock.getReceivedMsg())));
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Server did not receive the correct message");
 		}
