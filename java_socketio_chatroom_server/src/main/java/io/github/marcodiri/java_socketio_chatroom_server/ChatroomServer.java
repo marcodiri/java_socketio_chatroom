@@ -12,9 +12,9 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatroomServer {
 
@@ -25,15 +25,15 @@ public class ChatroomServer {
     private final SocketIoNamespace namespace;
     private final ServerRepository repository;
 
-    private final HashMap<String, String> usernameList;
+    private final ConcurrentHashMap<String, String> usernameList;
 
-	private static final Logger LOGGER = LogManager.getLogger(ChatroomServer.class);
+    private static final Logger LOGGER = LogManager.getLogger(ChatroomServer.class);
 
     public ChatroomServer(ServerRepository repository) {
         this.serverWrapper = new ServerWrapper();
         this.namespace = serverWrapper.getSocketIoServer().namespace("/");
         this.repository = repository;
-        this.usernameList = new HashMap<>();
+        this.usernameList = new ConcurrentHashMap<>();
     }
 
     public void start() throws Exception {
