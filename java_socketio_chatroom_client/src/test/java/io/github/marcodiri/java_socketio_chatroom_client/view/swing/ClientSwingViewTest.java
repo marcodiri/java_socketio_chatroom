@@ -262,6 +262,8 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         JTextComponentFixture txtUsername = window.textBox("txtUsername");
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
 
+        clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
+
         String username = "Username";
         String message = "Text";
         txtUsername.setText(username);
@@ -287,6 +289,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
         JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
 
+        clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
         doThrow(new SocketException("Unable to send message when not connected to server")).when(client).sendMessage(any(ClientMessage.class));
 
         String username = "Username";
@@ -311,6 +314,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
         JButtonFixture btnSend = window.button(JButtonMatcher.withText("Send"));
 
+        clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
 
         String username = "Username";
         String message = "Text";
@@ -341,6 +345,7 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
         JButtonFixture btnSend = window.button(JButtonMatcher.withText("Send"));
 
+        clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
         doThrow(new SocketException("Unable to send message when not connected to server")).when(client).sendMessage(any(ClientMessage.class));
 
         String username = "Username";

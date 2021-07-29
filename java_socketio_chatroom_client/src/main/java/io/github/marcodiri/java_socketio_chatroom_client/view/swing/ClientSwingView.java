@@ -188,22 +188,8 @@ public class ClientSwingView extends JFrame implements ClientView {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                if (!txtMessage.getText().trim().isEmpty() && e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    txtErrorMessage.setText("");
-                    ClientMessage msg = new ClientMessage(
-                            new Timestamp(System.currentTimeMillis()),
-                            txtUsername.getText(),
-                            txtMessage.getText()
-                    );
-                    try {
-                        client.sendMessage(msg);
-                    } catch (SocketException ex) {
-                        LOGGER.error(ex.getMessage());
-                        txtErrorMessage.setText(ex.getMessage());
-                        return;
-                    }
-                    txtMessage.setText("");
-                }
+                if (!txtMessage.getText().trim().isEmpty() && e.getKeyCode() == KeyEvent.VK_ENTER)
+                    sendMessage();
             }
         };
 
@@ -220,23 +206,7 @@ public class ClientSwingView extends JFrame implements ClientView {
         txtMessage.setColumns(10);
 
         btnSend = new JButton("Send");
-        btnSend.addActionListener(e -> {
-            txtErrorMessage.setText("");
-            ClientMessage msg = new ClientMessage(
-                    new Timestamp(System.currentTimeMillis()),
-                    txtUsername.getText(),
-                    txtMessage.getText()
-            );
-            try {
-                client.sendMessage(msg);
-            } catch (SocketException ex) {
-                LOGGER.error(ex.getMessage());
-                txtErrorMessage.setText(ex.getMessage());
-                return;
-            }
-            txtMessage.setText("");
-            btnSend.setEnabled(false);
-        });
+        btnSend.addActionListener(e -> sendMessage());
         btnSend.setEnabled(false);
         GridBagConstraints gbc_btnSend = new GridBagConstraints();
         gbc_btnSend.gridx = 1;
@@ -271,6 +241,25 @@ public class ClientSwingView extends JFrame implements ClientView {
 
     public void setClient(ChatroomClient client) {
         this.client = client;
+    }
+
+    private void sendMessage() {
+        txtErrorMessage.setText("");
+        snapshot.save(() -> {
+        });
+        ClientMessage msg = new ClientMessage(
+                new Timestamp(System.currentTimeMillis()),
+                txtUsername.getText(),
+                txtMessage.getText()
+        );
+        try {
+            client.sendMessage(msg);
+            txtMessage.setText("");
+            btnSend.setEnabled(false);
+        } catch (SocketException ex) {
+            LOGGER.error(ex.getMessage());
+            showError(ex.getMessage());
+        }
     }
 
     class ViewSnapshot {
