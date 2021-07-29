@@ -25,6 +25,5 @@ public class App {
             } catch (Exception e) {
             }
         });
-    	LOGGER.info("Client app stopped");
     }
 }
