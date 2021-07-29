@@ -24,8 +24,7 @@ import java.net.SocketException;
 import java.sql.Timestamp;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.*;
 
@@ -283,6 +282,30 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
     }
 
     @Test
+    public void testTxtMessageShowsErrorWhenDisconnectedFromServerAndTextIsTypedAndEnterIsPressed() throws SocketException {
+        JTextComponentFixture txtUsername = window.textBox("txtUsername");
+        JTextComponentFixture txtMessage = window.textBox("txtMessage");
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
+
+        doThrow(new SocketException("Unable to send message when not connected to server")).when(client).sendMessage(any(ClientMessage.class));
+
+        String username = "Username";
+        String message = "Text";
+        txtUsername.setText(username);
+        setEnabled(txtMessage.target(), true);
+        txtMessage.enterText(message);
+        txtMessage.pressAndReleaseKeys(KeyEvent.VK_ENTER);
+
+        try {
+            await().atMost(2, SECONDS).untilAsserted(() -> assertThat(txtErrorMessage.text()).isEqualTo("Unable to send message when not connected to server"));
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Error message not displayed or invalid message");
+        }
+
+        txtMessage.requireText(message);
+    }
+
+    @Test
     public void testBtnSendSendsMessageAndClearsTxtMessageAndDisablesItself() {
         JTextComponentFixture txtUsername = window.textBox("txtUsername");
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
@@ -309,6 +332,34 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
 
         assertThat(captor.getValue().getUser()).isEqualTo(username);
         assertThat(captor.getValue().getUserMessage()).isEqualTo(message);
+    }
+
+    @Test
+    public void testBtnSendShowsErrorWhenDisconnectedFromServer() throws SocketException {
+        JTextComponentFixture txtUsername = window.textBox("txtUsername");
+        JTextComponentFixture txtMessage = window.textBox("txtMessage");
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
+        JButtonFixture btnSend = window.button(JButtonMatcher.withText("Send"));
+
+        doThrow(new SocketException("Unable to send message when not connected to server")).when(client).sendMessage(any(ClientMessage.class));
+
+        String username = "Username";
+        String message = "Text";
+        txtUsername.setText(username);
+        setEnabled(txtMessage.target(), true);
+        setEnabled(btnSend.target(), true);
+        txtMessage.setText(message);
+
+        btnSend.click();
+        try {
+            await().atMost(2, SECONDS).untilAsserted(() -> assertThat(txtErrorMessage.text()).isEqualTo("Unable to send message when not connected to server"));
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Error message not displayed or invalid message");
+        }
+
+        btnSend.requireEnabled();
+        txtMessage.requireText(message);
+
     }
 
     private void setEnabled(Component component, boolean enable) {

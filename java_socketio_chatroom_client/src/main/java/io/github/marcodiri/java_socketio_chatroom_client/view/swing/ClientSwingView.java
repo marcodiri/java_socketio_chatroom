@@ -189,6 +189,7 @@ public class ClientSwingView extends JFrame implements ClientView {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (!txtMessage.getText().trim().isEmpty() && e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    txtErrorMessage.setText("");
                     ClientMessage msg = new ClientMessage(
                             new Timestamp(System.currentTimeMillis()),
                             txtUsername.getText(),
@@ -198,6 +199,8 @@ public class ClientSwingView extends JFrame implements ClientView {
                         client.sendMessage(msg);
                     } catch (SocketException ex) {
                         LOGGER.error(ex.getMessage());
+                        txtErrorMessage.setText(ex.getMessage());
+                        return;
                     }
                     txtMessage.setText("");
                 }
@@ -218,6 +221,7 @@ public class ClientSwingView extends JFrame implements ClientView {
 
         btnSend = new JButton("Send");
         btnSend.addActionListener(e -> {
+            txtErrorMessage.setText("");
             ClientMessage msg = new ClientMessage(
                     new Timestamp(System.currentTimeMillis()),
                     txtUsername.getText(),
@@ -227,6 +231,8 @@ public class ClientSwingView extends JFrame implements ClientView {
                 client.sendMessage(msg);
             } catch (SocketException ex) {
                 LOGGER.error(ex.getMessage());
+                txtErrorMessage.setText(ex.getMessage());
+                return;
             }
             txtMessage.setText("");
             btnSend.setEnabled(false);
