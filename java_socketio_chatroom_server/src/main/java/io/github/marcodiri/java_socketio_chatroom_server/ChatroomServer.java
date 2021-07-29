@@ -54,7 +54,7 @@ public class ChatroomServer {
             LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
             handleClientJoin(socket);
             handleClientMessage(socket, namespace);
-            handleClientLeave(socket);
+            handleClientDisconnect(socket);
         });
     }
 
@@ -94,7 +94,7 @@ public class ChatroomServer {
         });
     }
 
-    private void handleClientLeave(SocketIoSocket socket) {
+    private void handleClientDisconnect(SocketIoSocket socket) {
         socket.on("disconnect", arg -> {
             LOGGER.debug(() -> String.format("Received {event: \"disconnect\"} from Socket %s", socket.getId()));
             socket.leaveRoom(CHATROOM_NAME);
