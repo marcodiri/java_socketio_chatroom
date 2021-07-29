@@ -20,11 +20,11 @@ import org.mockito.ArgumentCaptor;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.net.SocketException;
 import java.sql.Timestamp;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.*;
 
@@ -261,6 +261,40 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
     public void testTxtMessageSendsMessageWhenTextIsTypedAndEnterIsPressed() {
         JTextComponentFixture txtUsername = window.textBox("txtUsername");
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
+
+        clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
+
+        String username = "Username";
+        String message = "Text";
+        txtUsername.setText(username);
+        setEnabled(txtMessage.target(), true);
+        txtMessage.enterText(message);
+        txtErrorMessage.setText("Error!");
+
+        txtMessage.pressAndReleaseKeys(KeyEvent.VK_ENTER);
+
+        ArgumentCaptor<ClientMessage> captor = ArgumentCaptor.forClass(ClientMessage.class);
+        try {
+            verify(client).sendMessage(captor.capture());
+        } catch (SocketException e) {
+            fail(e.getMessage());
+        }
+        txtMessage.requireEmpty();
+        txtErrorMessage.requireEmpty();
+
+        assertThat(captor.getValue().getUser()).isEqualTo(username);
+        assertThat(captor.getValue().getUserMessage()).isEqualTo(message);
+    }
+
+    @Test
+    public void testTxtMessageShowsErrorWhenDisconnectedFromServerAndTextIsTypedAndEnterIsPressed() throws SocketException {
+        JTextComponentFixture txtUsername = window.textBox("txtUsername");
+        JTextComponentFixture txtMessage = window.textBox("txtMessage");
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
+
+        clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
+        doThrow(new SocketException("Unable to send message when not connected to server")).when(client).sendMessage(any(ClientMessage.class));
 
         String username = "Username";
         String message = "Text";
@@ -269,12 +303,13 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         txtMessage.enterText(message);
         txtMessage.pressAndReleaseKeys(KeyEvent.VK_ENTER);
 
-        ArgumentCaptor<ClientMessage> captor = ArgumentCaptor.forClass(ClientMessage.class);
-        verify(client).sendMessage(captor.capture());
-        txtMessage.requireEmpty();
+        try {
+            await().atMost(2, SECONDS).untilAsserted(() -> assertThat(txtErrorMessage.text()).isEqualTo("Unable to send message when not connected to server"));
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Error message not displayed or invalid message");
+        }
 
-        assertThat(captor.getValue().getUser()).isEqualTo(username);
-        assertThat(captor.getValue().getUserMessage()).isEqualTo(message);
+        txtMessage.requireText(message);
     }
 
     @Test
@@ -282,7 +317,43 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         JTextComponentFixture txtUsername = window.textBox("txtUsername");
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
         JButtonFixture btnSend = window.button(JButtonMatcher.withText("Send"));
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
 
+        clientSwingView.snapshot = mock(ClientSwingView.ViewSnapshot.class);
+
+        String username = "Username";
+        String message = "Text";
+        txtUsername.setText(username);
+        setEnabled(txtMessage.target(), true);
+        setEnabled(btnSend.target(), true);
+        txtMessage.setText(message);
+        txtErrorMessage.setText("Error!");
+
+        ArgumentCaptor<ClientMessage> captor = ArgumentCaptor.forClass(ClientMessage.class);
+
+        btnSend.click();
+        try {
+            verify(client).sendMessage(captor.capture());
+        } catch (SocketException e) {
+            fail(e.getMessage());
+        }
+        txtMessage.requireEmpty();
+        btnSend.requireDisabled();
+        txtErrorMessage.requireEmpty();
+
+        assertThat(captor.getValue().getUser()).isEqualTo(username);
+        assertThat(captor.getValue().getUserMessage()).isEqualTo(message);
+    }
+
+    @Test
+    public void testBtnSendShowsErrorWhenDisconnectedFromServer() throws SocketException {
+        JTextComponentFixture txtUsername = window.textBox("txtUsername");
+        JTextComponentFixture txtMessage = window.textBox("txtMessage");
+        JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
+        JButtonFixture btnSend = window.button(JButtonMatcher.withText("Send"));
+
+        clientSwingView.snapshot = spy(new ClientSwingView.ViewSnapshot());
+        doThrow(new SocketException("Unable to send message when not connected to server")).when(client).sendMessage(any(ClientMessage.class));
 
         String username = "Username";
         String message = "Text";
@@ -291,15 +362,16 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         setEnabled(btnSend.target(), true);
         txtMessage.setText(message);
 
-        ArgumentCaptor<ClientMessage> captor = ArgumentCaptor.forClass(ClientMessage.class);
-
         btnSend.click();
-        verify(client).sendMessage(captor.capture());
-        txtMessage.requireEmpty();
-        btnSend.requireDisabled();
+        try {
+            await().atMost(2, SECONDS).untilAsserted(() -> assertThat(txtErrorMessage.text()).isEqualTo("Unable to send message when not connected to server"));
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Error message not displayed or invalid message");
+        }
 
-        assertThat(captor.getValue().getUser()).isEqualTo(username);
-        assertThat(captor.getValue().getUserMessage()).isEqualTo(message);
+        btnSend.requireEnabled();
+        txtMessage.requireText(message);
+
     }
 
     private void setEnabled(Component component, boolean enable) {

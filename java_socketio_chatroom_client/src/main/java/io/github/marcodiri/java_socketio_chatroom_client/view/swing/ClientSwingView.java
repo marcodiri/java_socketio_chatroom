@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.net.SocketException;
 import java.sql.Timestamp;
 
 @SuppressWarnings("serial")
@@ -37,7 +38,7 @@ public class ClientSwingView extends JFrame implements ClientView {
     private JTextPane txtErrorMessage;
 
     transient ViewSnapshot snapshot;
-    
+
     private static final Logger LOGGER = LogManager.getLogger(ClientSwingView.class);
 
     /**
@@ -187,15 +188,8 @@ public class ClientSwingView extends JFrame implements ClientView {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                if (!txtMessage.getText().trim().isEmpty() && e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    ClientMessage msg = new ClientMessage(
-                            new Timestamp(System.currentTimeMillis()),
-                            txtUsername.getText(),
-                            txtMessage.getText()
-                    );
-                    client.sendMessage(msg);
-                    txtMessage.setText("");
-                }
+                if (!txtMessage.getText().trim().isEmpty() && e.getKeyCode() == KeyEvent.VK_ENTER)
+                    sendMessage();
             }
         };
 
@@ -212,16 +206,7 @@ public class ClientSwingView extends JFrame implements ClientView {
         txtMessage.setColumns(10);
 
         btnSend = new JButton("Send");
-        btnSend.addActionListener(e -> {
-            ClientMessage msg = new ClientMessage(
-                    new Timestamp(System.currentTimeMillis()),
-                    txtUsername.getText(),
-                    txtMessage.getText()
-            );
-            client.sendMessage(msg);
-            txtMessage.setText("");
-            btnSend.setEnabled(false);
-        });
+        btnSend.addActionListener(e -> sendMessage());
         btnSend.setEnabled(false);
         GridBagConstraints gbc_btnSend = new GridBagConstraints();
         gbc_btnSend.gridx = 1;
@@ -231,7 +216,7 @@ public class ClientSwingView extends JFrame implements ClientView {
 
     @Override
     public void addMessage(Message msg) {
-    	LOGGER.info("Adding new Message to board");
+        LOGGER.info("Adding new Message to board");
         LOGGER.debug(msg::toString);
         SwingUtilities.invokeLater(() -> msgsBoard.newMessageNotify(msg));
     }
@@ -258,7 +243,26 @@ public class ClientSwingView extends JFrame implements ClientView {
         this.client = client;
     }
 
-    class ViewSnapshot {
+    private void sendMessage() {
+        txtErrorMessage.setText("");
+        snapshot.save(() -> {
+        });
+        ClientMessage msg = new ClientMessage(
+                new Timestamp(System.currentTimeMillis()),
+                txtUsername.getText(),
+                txtMessage.getText()
+        );
+        try {
+            client.sendMessage(msg);
+            txtMessage.setText("");
+            btnSend.setEnabled(false);
+        } catch (SocketException ex) {
+            LOGGER.error(ex.getMessage());
+            showError(ex.getMessage());
+        }
+    }
+
+    static class ViewSnapshot {
         private Runnable snapshot;
 
         void save(Runnable runnable) {

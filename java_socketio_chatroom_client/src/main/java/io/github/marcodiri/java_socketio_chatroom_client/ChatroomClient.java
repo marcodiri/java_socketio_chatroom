@@ -1,5 +1,6 @@
 package io.github.marcodiri.java_socketio_chatroom_client;
 
+import java.net.SocketException;
 import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +18,7 @@ public class ChatroomClient {
     private final Socket socket;
 
     private final ClientView view;
-    
+
     private static final Logger LOGGER = LogManager.getLogger(ChatroomClient.class);
 
     public ChatroomClient(URI uri, Options options, ClientView view) {
@@ -35,58 +36,58 @@ public class ChatroomClient {
 
     public void connect(String username) {
         socket.on(Socket.EVENT_CONNECT, objects -> {
-        	LOGGER.info("Socket succesfully connected to Server");
+            LOGGER.info("Socket succesfully connected to Server");
             handleJoin();
             socket.emit("join", username);
-        	LOGGER.info("Socket attempting to join the room");
+            LOGGER.info("Socket attempting to join the room");
             LOGGER.debug(() -> String.format("Sent {event: \"join\", message: \"%s\"} to Server", username));
             handleMessage();
             handleError();
         });
         socket.connect();
-    	LOGGER.info("Socket attempting to connect to Server");
+        LOGGER.info("Socket attempting to connect to Server");
     }
 
     public void disconnect() {
         socket.on(Socket.EVENT_DISCONNECT, objects -> {
-        	LOGGER.info("Socket succesfully disconnected from Server");
-        	socket.off();
+            LOGGER.info("Socket succesfully disconnected from Server");
+            socket.off();
         });
         socket.disconnect();
-    	LOGGER.info("Socket attempting to disconnect from Server");
+        LOGGER.info("Socket attempting to disconnect from Server");
     }
 
-    public void sendMessage(ClientMessage msg) throws RuntimeException {
+    public void sendMessage(ClientMessage msg) throws SocketException {
         if (isConnected()) {
             socket.emit("msg", msg.toJSON());
-        	LOGGER.info("Message sent to Server");
+            LOGGER.info("Message sent to Server");
             LOGGER.debug(() -> String.format("Sent {event: \"msg\", message: \"%s\"} to Server", msg.toJSON()));
         } else {
-            throw new RuntimeException("Unable to send message when not connected to server");
+            throw new SocketException("Unable to send message when not connected to server");
         }
     }
 
     void handleMessage() {
         socket.on("msg", arg -> {
-        	LOGGER.info("Message received from Server");
+            LOGGER.info("Message received from Server");
             LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} from Server", arg[0]));
-        	view.addMessage(new ClientMessage((JSONObject) arg[0]));
+            view.addMessage(new ClientMessage((JSONObject) arg[0]));
         });
     }
 
     void handleJoin() {
         socket.on("joined", args -> {
-        	LOGGER.info("Socket succesfully joined the room");
+            LOGGER.info("Socket succesfully joined the room");
             LOGGER.debug(() -> String.format("Received {event: \"joined\", message: \"%s\"} from Server", args[0]));
-        	view.roomJoined(((JSONObject) args[0]).getString("roomName"));
+            view.roomJoined(((JSONObject) args[0]).getString("roomName"));
         });
     }
 
     void handleError() {
         socket.on("error", args -> {
-        	LOGGER.info("Error received from Server");
+            LOGGER.info("Error received from Server");
             LOGGER.debug(() -> String.format("Received {event: \"error\", message: \"%s\"} from Server", args[0]));
-        	view.showError(((JSONObject) args[0]).getString("message"));
+            view.showError(((JSONObject) args[0]).getString("message"));
         });
     }
 }
