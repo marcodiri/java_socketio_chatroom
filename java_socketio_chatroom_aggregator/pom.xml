@@ -56,6 +56,12 @@
 				<module>../java_socketio_chatroom_report</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>e2e-tests</id>
+			<modules>
+				<module>../java_socketio_chatroom_e2e</module>
+			</modules>
+		</profile>
 	</profiles>
 
 </project>
