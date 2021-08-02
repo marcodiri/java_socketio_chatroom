@@ -57,9 +57,9 @@ public class MultipleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 		application("io.github.marcodiri.java_socketio_chatroom_client.App").start();
 		
 		// get a reference of Clients JFrame
-		frames = new ArrayList<Frame>();
 		try {
             await().atMost(5, SECONDS).until(() -> {
+            	frames = new ArrayList<Frame>();
             	Frame[] fs = Frame.getFrames();
             	for (Frame f : fs) {
 					if ("Socket.io Chatroom".equals(f.getTitle()) && f.isShowing()) {
