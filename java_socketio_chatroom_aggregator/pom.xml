@@ -58,6 +58,12 @@
 		</profile>
 		<profile>
 			<id>e2e-tests</id>
+			<activation>
+				<property>
+					<name>skipE2E</name>
+					<value>!true</value>
+				</property>
+			</activation>
 			<modules>
 				<module>../java_socketio_chatroom_e2e</module>
 			</modules>

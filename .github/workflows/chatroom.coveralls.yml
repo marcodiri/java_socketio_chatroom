@@ -8,7 +8,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      # test against several Java versions:
       matrix:
         include:
           - additional-maven-args: >
