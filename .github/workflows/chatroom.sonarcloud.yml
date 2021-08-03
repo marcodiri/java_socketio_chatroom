@@ -3,7 +3,7 @@ name: Java CI Test Ubuntu Sonar
 on:
   push:
   pull_request:
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
 
     - name: Build with Maven and SonarCloud
       run: >
-        xvfb-run mvn -B verify -Pjacoco sonar:sonar
+        xvfb-run mvn -B verify -Pjacoco -DskipE2E sonar:sonar
         -Dsonar.projectKey=marcodiri_java_socketio_chatroom
         -Dsonar.organization=marcodiri
         -Dsonar.host.url=https://sonarcloud.io

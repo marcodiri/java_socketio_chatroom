@@ -3,7 +3,7 @@ name: Java CI Test Ubuntu
 on:
   push:
   pull_request:
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,8 +33,15 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
         restore-keys: ${{ runner.os }}-m2-
 
+    - name: Install and start window manager
+      run: |
+        sudo apt-get install -y blackbox
+        Xvfb :99 -ac -screen 0 1280x1024x24 &
+        sleep 3
+        DISPLAY=:99 blackbox &
+
     - name: Build with Maven
-      run: xvfb-run mvn verify ${{ matrix.additional-maven-args }}
+      run: DISPLAY=:99 mvn verify ${{ matrix.additional-maven-args }}
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       working-directory: java_socketio_chatroom_aggregator
