@@ -33,6 +33,7 @@ public class App {
             Thread.sleep(Long.MAX_VALUE);
         } catch (InterruptedException e) {
             stopServer(chatroomServer);
+            Thread.currentThread().interrupt();
         }
     }
 
