@@ -1,14 +1,7 @@
 package io.github.marcodiri.java_socketio_chatroom_e2e;
 
-import static org.assertj.swing.launcher.ApplicationLauncher.*;
-import static org.awaitility.Awaitility.await;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.*;
-
-import java.sql.Timestamp;
-import javax.swing.JFrame;
-
-import io.github.marcodiri.java_socketio_chatroom_server.App;
+import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.core.matcher.JButtonMatcher;
@@ -19,13 +12,17 @@ import org.assertj.swing.fixture.JTextComponentFixture;
 import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.bson.Document;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
+import javax.swing.*;
+import java.sql.Timestamp;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.swing.launcher.ApplicationLauncher.application;
+import static org.awaitility.Awaitility.await;
 
 @RunWith(GUITestRunner.class)
 public class SingleChatroomClientE2E extends AssertJSwingJUnitTestCase {
