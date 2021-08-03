@@ -33,9 +33,16 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
         restore-keys: ${{ runner.os }}-m2-
 
+    - name: Install and start window manager
+      run: |
+        sudo apt-get install -y blackbox
+        Xvfb :99 -ac -screen 0 1280x1024x24 &
+        sleep 3
+        DISPLAY=:99 blackbox &
+
     - name: Build with Maven and SonarCloud
       run: >
-        xvfb-run mvn -B verify -Pjacoco -DskipE2E sonar:sonar
+        DISPLAY=:99 mvn -B verify -Pjacoco sonar:sonar
         -Dsonar.projectKey=marcodiri_java_socketio_chatroom
         -Dsonar.organization=marcodiri
         -Dsonar.host.url=https://sonarcloud.io
