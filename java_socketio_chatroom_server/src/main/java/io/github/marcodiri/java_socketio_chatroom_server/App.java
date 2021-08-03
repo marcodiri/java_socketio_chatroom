@@ -22,12 +22,10 @@ public class App {
         try {
             chatroomServer.start();
         } catch (Exception e) {
-        	LOGGER.fatal("Server could not be started: " + e.getMessage());
+        	LOGGER.fatal("Server could not be started: {}", e.getMessage());
         }
         
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-           stopServer(chatroomServer);
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> stopServer(chatroomServer)));
         
         try {
             Thread.sleep(Long.MAX_VALUE);
@@ -41,7 +39,7 @@ public class App {
 		try {
 		    chatroomServer.stop();
 		} catch (Exception e) {
-		    LOGGER.fatal("Server could not be stopped: " + e.getMessage());
+		    LOGGER.fatal("Server could not be stopped: {}", e.getMessage());
 		}
 	}
 }
