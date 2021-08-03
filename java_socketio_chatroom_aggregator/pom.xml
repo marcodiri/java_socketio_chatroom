@@ -23,7 +23,7 @@
 		
 		<!-- For each rule to be ignored, add another eXX and two corresponding 
 			properties with eXX in the name as below -->
-		<sonar.issue.ignore.multicriteria>e11,e12,e13</sonar.issue.ignore.multicriteria>
+		<sonar.issue.ignore.multicriteria>e11,e12,e13,e14</sonar.issue.ignore.multicriteria>
 		<!-- Disable rule for "Field names should comply with a naming convention" -->
 		<sonar.issue.ignore.multicriteria.e11.ruleKey>
 			java:S116
@@ -47,6 +47,14 @@
 		<sonar.issue.ignore.multicriteria.e13.resourceKey>
 			**/ClientSwingViewTest.java
 		</sonar.issue.ignore.multicriteria.e13.resourceKey>
+		<!-- Disable rule for "Test classes should comply with a naming convention"
+			for E2E tests -->
+		<sonar.issue.ignore.multicriteria.e14.ruleKey>
+			java:S3577
+		</sonar.issue.ignore.multicriteria.e14.ruleKey>
+		<sonar.issue.ignore.multicriteria.e14.resourceKey>
+			**/*E2E.java
+		</sonar.issue.ignore.multicriteria.e14.resourceKey>
 	</properties>
 
 	<profiles>
