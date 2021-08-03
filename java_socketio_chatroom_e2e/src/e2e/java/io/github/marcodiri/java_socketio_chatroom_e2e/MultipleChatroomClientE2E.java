@@ -39,22 +39,7 @@ public class MultipleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 
 	private MongoClient mongoClient;
 
-	private static Thread serverThread;
-
 	List<Frame> frames;
-
-	@BeforeClass
-	public static void setup() {
-		// start the Server
-		serverThread = new Thread(() -> App.main(null));
-		serverThread.start();
-	}
-
-	@AfterClass
-	public static void stopServer() throws InterruptedException {
-		serverThread.interrupt();
-		serverThread.join();
-	}
 
 	@Override
 	protected void onSetUp() {
