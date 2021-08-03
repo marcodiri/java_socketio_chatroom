@@ -108,10 +108,11 @@
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
 				<configuration>
+					<containerNamePattern>%a</containerNamePattern>
 					<autoCreateCustomNetworks>true</autoCreateCustomNetworks>
 					<images>
 						<image>
-							<name>maven:3.8.1-openjdk-8</name>
+							<name>openjdk:8</name>
 							<alias>server</alias>
 							<build>
 								<contextDir>${project.basedir}</contextDir>

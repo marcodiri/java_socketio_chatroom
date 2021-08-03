@@ -1,5 +1,5 @@
-FROM maven:3.8.1-openjdk-8
+FROM openjdk:8
 
-COPY target/extra-resources /app
+COPY target/extra-resources/server-app/*jar-with-dependencies.jar /app/server.jar
 
-CMD java -jar /app/server-app/*jar-with-dependencies.jar
+CMD ["java", "-jar", "/app/server.jar", "mongodb"]
