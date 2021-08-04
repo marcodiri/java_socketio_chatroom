@@ -148,11 +148,11 @@
 									<name>server-db-network</name>
 								</network>
 								<ports>
-									<port>27017:27017</port>
+									<port>mongo.mapped.port:27017</port>
 								</ports>
 								<wait>
 									<http>
-										<url>http://localhost:27017</url>
+										<url>http://localhost:${mongo.mapped.port}</url>
 										<method>GET</method>
 										<status>200</status>
 									</http>
