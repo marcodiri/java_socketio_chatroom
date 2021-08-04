@@ -29,8 +29,7 @@ import com.mongodb.ServerAddress;
 @RunWith(GUITestRunner.class)
 public class MultipleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 
-	public static final String CHATROOM_DB_NAME = "chatroom";
-	public static final String MESSAGES_COLLECTION_NAME = "messages";
+    public static final String CHATROOM_DB_NAME = "chatroom";
 
 	private static final String MESSAGE_1_USER = "user1";
 	private static final String MESSAGE_1_TEXT = "text1";
