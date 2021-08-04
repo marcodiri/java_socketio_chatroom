@@ -120,42 +120,6 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<configuration>
-					<images>
-						<image>
-							<name>mongo:4.2.14</name>
-							<run>
-								<ports>
-									<port>27017:27017</port>
-								</ports>
-								<wait>
-									<http>
-										<url>http://localhost:27017</url>
-										<method>GET</method>
-										<status>200</status>
-									</http>
-									<time>10000</time>
-								</wait>
-							</run>
-						</image>
-					</images>
-				</configuration>
-				<executions>
-					<execution>
-						<id>docker-start</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>start</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>docker-stop</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
