@@ -13,11 +13,8 @@ public class App {
 	private static final Logger LOGGER = LogManager.getLogger(App.class);
 
     public static void main(String[] args) {
-        String mongoHost = "localhost";
-        if (args.length > 0)
-            mongoHost = args[0];
         int mongoPort = Integer.parseInt(System.getProperty("mongo.port", "27017"));
-        MongoClient client = new MongoClient(new ServerAddress(mongoHost, mongoPort));
+        MongoClient client = new MongoClient(new ServerAddress("localhost", mongoPort));
 
         ServerRepository mongoRepository = new ServerMongoRepository(client);
 

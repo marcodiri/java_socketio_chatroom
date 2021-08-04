@@ -1,7 +1,14 @@
 package io.github.marcodiri.java_socketio_chatroom_e2e;
 
-import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
+import static org.assertj.swing.launcher.ApplicationLauncher.*;
+import static org.awaitility.Awaitility.await;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.*;
+
+import java.sql.Timestamp;
+import javax.swing.JFrame;
+
+import io.github.marcodiri.java_socketio_chatroom_server.App;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.core.matcher.JButtonMatcher;
@@ -12,17 +19,13 @@ import org.assertj.swing.fixture.JTextComponentFixture;
 import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.bson.Document;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.swing.*;
-import java.sql.Timestamp;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.assertj.swing.launcher.ApplicationLauncher.application;
-import static org.awaitility.Awaitility.await;
+import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
 
 @RunWith(GUITestRunner.class)
 public class SingleChatroomClientE2E extends AssertJSwingJUnitTestCase {
@@ -39,7 +42,22 @@ public class SingleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 
     private MongoClient mongoClient;
 
+    private static Thread serverThread;
+
     private FrameFixture window;
+
+    @BeforeClass
+    public static void setup() {
+        // start the Server
+        serverThread = new Thread(() -> App.main(null));
+        serverThread.start();
+    }
+
+    @AfterClass
+    public static void stopServer() throws InterruptedException {
+        serverThread.interrupt();
+        serverThread.join();
+    }
 
     @Override
     protected void onSetUp() {
@@ -78,7 +96,7 @@ public class SingleChatroomClientE2E extends AssertJSwingJUnitTestCase {
         btnConnect.click();
 
         try {
-            await().atMost(2, SECONDS).untilAsserted(() -> assertThat(msgsTextPane.text()).contains(MESSAGE_1_USER,
+            await().atMost(5, SECONDS).untilAsserted(() -> assertThat(msgsTextPane.text()).contains(MESSAGE_1_USER,
                     MESSAGE_1_TEXT, MESSAGE_2_USER, MESSAGE_2_TEXT));
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Saved message not displayed in message board");
@@ -102,7 +120,7 @@ public class SingleChatroomClientE2E extends AssertJSwingJUnitTestCase {
         btnConnect.click();
 
         try {
-            await().atMost(2, SECONDS).untilAsserted(() -> txtMessage.requireEnabled());
+            await().atMost(5, SECONDS).untilAsserted(() -> txtMessage.requireEnabled());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Message text box not enabled");
         }
