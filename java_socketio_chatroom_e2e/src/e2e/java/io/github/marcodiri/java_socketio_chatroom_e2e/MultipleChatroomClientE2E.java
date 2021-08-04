@@ -114,7 +114,7 @@ public class MultipleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 		btnConnect1.click();
 		
 		try {
-			await().atMost(2, SECONDS).untilAsserted(() -> txtMessage1.requireEnabled());
+			await().atMost(5, SECONDS).untilAsserted(() -> txtMessage1.requireEnabled());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Client1 message text box not enabled");
 		}
@@ -172,7 +172,7 @@ public class MultipleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 		btnConnect1.click();
 
 		try {
-			await().atMost(2, SECONDS).untilAsserted(() -> btnDisconnect1.requireEnabled());
+			await().atMost(5, SECONDS).untilAsserted(() -> btnDisconnect1.requireEnabled());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Client1 message disconnect button not enabled");
 		}

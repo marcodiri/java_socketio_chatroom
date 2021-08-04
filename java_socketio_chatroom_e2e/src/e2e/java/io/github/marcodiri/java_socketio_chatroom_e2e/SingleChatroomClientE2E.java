@@ -96,7 +96,7 @@ public class SingleChatroomClientE2E extends AssertJSwingJUnitTestCase {
         btnConnect.click();
 
         try {
-            await().atMost(2, SECONDS).untilAsserted(() -> assertThat(msgsTextPane.text()).contains(MESSAGE_1_USER,
+            await().atMost(5, SECONDS).untilAsserted(() -> assertThat(msgsTextPane.text()).contains(MESSAGE_1_USER,
                     MESSAGE_1_TEXT, MESSAGE_2_USER, MESSAGE_2_TEXT));
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Saved message not displayed in message board");
@@ -120,7 +120,7 @@ public class SingleChatroomClientE2E extends AssertJSwingJUnitTestCase {
         btnConnect.click();
 
         try {
-            await().atMost(2, SECONDS).untilAsserted(() -> txtMessage.requireEnabled());
+            await().atMost(5, SECONDS).untilAsserted(() -> txtMessage.requireEnabled());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Message text box not enabled");
         }
