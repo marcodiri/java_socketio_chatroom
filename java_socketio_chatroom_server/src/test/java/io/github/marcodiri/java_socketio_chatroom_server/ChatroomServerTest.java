@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Arrays.asList;
@@ -89,7 +90,7 @@ public class ChatroomServerTest {
             fail("Expected " + asList(msg1, msg2) + " but got " + retrievedMessages);
         }
         verify(serverRepository, times(1)).findAll();
-        assertThat(chatroomServer.getUsernameList()).containsExactly(entry(clientSocket.id(),"user"));
+        assertThat(chatroomServer.getUsernameList()).containsExactly(entry(clientSocket.id(), "user"));
     }
 
     @Test
@@ -234,10 +235,14 @@ public class ChatroomServerTest {
         });
         clientSocket.connect();
 
+        AtomicInteger roomSize = new AtomicInteger();
         try {
-            await().during(2, SECONDS).atMost(3, SECONDS).until(() -> chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length == 1);
+            await().during(2, SECONDS).atMost(5, SECONDS).until(() -> {
+                roomSize.set(chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length);
+                return roomSize.get() == 1;
+            });
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Expected 1 but got " + chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length);
+            fail("Expected 1 but got " + roomSize.get());
         }
 
         verify(serverRepository, times(1)).findAll();
