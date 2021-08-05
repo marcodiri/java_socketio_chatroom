@@ -103,7 +103,7 @@ public class ClientSwingViewIT extends AssertJSwingJUnitTestCase {
 
         JTextComponentFixture txtMessage = window.textBox("txtMessage");
         try {
-            await().atMost(2, SECONDS).untilAsserted(() -> txtMessage.requireEnabled());
+            await().atMost(2, SECONDS).untilAsserted(txtMessage::requireEnabled);
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Cannot connect to server");
         }

@@ -133,8 +133,8 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
         btnConnect.click();
         SwingUtilities.invokeLater(() -> clientSwingView.snapshot.restore());
         try {
-            await().atMost(2, SECONDS).untilAsserted(() -> btnConnect.requireEnabled());
-            await().atMost(2, SECONDS).untilAsserted(() -> txtUsername.requireEnabled());
+            await().atMost(2, SECONDS).untilAsserted(btnConnect::requireEnabled);
+            await().atMost(2, SECONDS).untilAsserted(txtUsername::requireEnabled);
             await().atMost(2, SECONDS).untilAsserted(() -> verify(client).disconnect());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Previous state not restored");

@@ -120,7 +120,7 @@ public class SingleChatroomClientE2E extends AssertJSwingJUnitTestCase {
         btnConnect.click();
 
         try {
-            await().atMost(5, SECONDS).untilAsserted(() -> txtMessage.requireEnabled());
+            await().atMost(5, SECONDS).untilAsserted(txtMessage::requireEnabled);
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Message text box not enabled");
         }
