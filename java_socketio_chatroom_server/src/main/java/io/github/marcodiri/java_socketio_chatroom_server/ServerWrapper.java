@@ -31,7 +31,8 @@ public class ServerWrapper {
     
 	private static final Logger LOGGER = LogManager.getLogger(ServerWrapper.class);
 
-    ServerWrapper() {
+    @SuppressWarnings("serial")
+	ServerWrapper() {
 
         mServer = new Server(3000);
         mEngineIoServer = new EngineIoServer(EngineIoServerOptions.newFromDefault().setPingTimeout(30000));
