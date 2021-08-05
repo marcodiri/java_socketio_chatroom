@@ -23,6 +23,11 @@
 		<socketIO.version>3.0.1</socketIO.version>
 		<engineIO.version>4.0.3</engineIO.version>
 		<engineIO-jetty.version>4.0.3</engineIO-jetty.version>
+
+		<sonar.junit.reportPaths>
+			${project.build.directory}/surefire-reports,
+			${project.build.directory}/failsafe-reports
+		</sonar.junit.reportPaths>
 		
 		<sonar.coverage.exclusions>
 			**/model/*.*,

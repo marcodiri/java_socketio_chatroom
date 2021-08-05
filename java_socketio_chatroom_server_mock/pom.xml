@@ -29,14 +29,17 @@
 		<socketIO.version>3.0.1</socketIO.version>
 		<engineIO.version>4.0.3</engineIO.version>
 		<engineIO-jetty.version>4.0.3</engineIO-jetty.version>
-		
+
+		<sonar.junit.reportPaths>
+			${project.build.directory}/surefire-reports
+		</sonar.junit.reportPaths>
+    	<aggregate.report.dir>java_socketio_chatroom_report/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
+    	<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
+
 		<sonar.coverage.exclusions>
 			**/ServerWrapper.*,
 			**/ServerWrapper$*.*
 		</sonar.coverage.exclusions>
-    	<aggregate.report.dir>java_socketio_chatroom_report/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
-    	<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
-    	
     	<sonar.cpd.exclusions>
 			**/ServerWrapper.*
     	</sonar.cpd.exclusions>
