@@ -15,17 +15,17 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		
-		<junit.version>4.13.1</junit.version>
-		<assertj.version>3.19.0</assertj.version>
+		<junit.version>4.13.2</junit.version>
+		<assertj.version>3.20.2</assertj.version>
 		<log4j.version>2.14.1</log4j.version>
 		<awaitility.version>4.1.0</awaitility.version>
 		<jacoco.plugin.version>0.8.7</jacoco.plugin.version>
-		<pitest.plugin.version>1.6.6</pitest.plugin.version>
+		<pitest.plugin.version>1.6.8</pitest.plugin.version>
 		<json.version>20210307</json.version>
 		<javax.version>4.0.1</javax.version>
-		<jetty-server.version>9.4.41.v20210516</jetty-server.version>
-		<jetty-servlet.version>9.4.41.v20210516</jetty-servlet.version>
-		<jetty-websocket.version>9.4.41.v20210516</jetty-websocket.version>
+		<jetty-server.version>9.4.43.v20210629</jetty-server.version>
+		<jetty-servlet.version>9.4.43.v20210629</jetty-servlet.version>
+		<jetty-websocket.version>9.4.43.v20210629</jetty-websocket.version>
 		<socketIO.version>3.0.1</socketIO.version>
 		<engineIO.version>4.0.3</engineIO.version>
 		<engineIO-jetty.version>4.0.3</engineIO-jetty.version>
@@ -179,15 +179,15 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-resources-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>3.2.0</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.0</version>
+					<version>3.8.1</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.22.1</version>
+					<version>2.22.2</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-failsafe-plugin</artifactId>
@@ -203,7 +203,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>3.2.0</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-install-plugin</artifactId>
@@ -215,11 +215,11 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.7.1</version>
+					<version>3.9.1</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>3.1.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>

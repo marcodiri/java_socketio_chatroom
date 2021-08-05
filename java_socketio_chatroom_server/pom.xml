@@ -17,9 +17,9 @@
 
 	<properties>
 		<javax.version>4.0.1</javax.version>
-		<jetty-server.version>9.4.41.v20210516</jetty-server.version>
-		<jetty-servlet.version>9.4.41.v20210516</jetty-servlet.version>
-		<jetty-websocket.version>9.4.41.v20210516</jetty-websocket.version>
+		<jetty-server.version>9.4.43.v20210629</jetty-server.version>
+		<jetty-servlet.version>9.4.43.v20210629</jetty-servlet.version>
+		<jetty-websocket.version>9.4.43.v20210629</jetty-websocket.version>
 		<socketIO.version>3.0.1</socketIO.version>
 		<engineIO.version>4.0.3</engineIO.version>
 		<engineIO-jetty.version>4.0.3</engineIO-jetty.version>
