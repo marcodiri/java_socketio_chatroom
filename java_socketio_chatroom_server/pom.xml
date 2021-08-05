@@ -16,7 +16,6 @@
 	<name>java_socketio_chatroom_server</name>
 
 	<properties>
-		<mongo.driver.version>3.12.8</mongo.driver.version>
 		<javax.version>4.0.1</javax.version>
 		<jetty-server.version>9.4.41.v20210516</jetty-server.version>
 		<jetty-servlet.version>9.4.41.v20210516</jetty-servlet.version>
@@ -39,11 +38,6 @@
 				<groupId>io.github.marcodiri</groupId>
 				<artifactId>java_socketio_chatroom_core</artifactId>
 				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mongodb</groupId>
-				<artifactId>mongo-java-driver</artifactId>
-				<version>${mongo.driver.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
