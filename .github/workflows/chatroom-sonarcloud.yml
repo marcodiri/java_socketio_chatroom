@@ -42,7 +42,7 @@ jobs:
 
       - name: Build with Maven and SonarCloud
         run: >
-          DISPLAY=:99 mvn -B verify -Pjacoco sonar:sonar
+          DISPLAY=:99 ../mvnw -B verify -Pjacoco sonar:sonar
           -Dsonar.projectKey=marcodiri_java_socketio_chatroom
           -Dsonar.organization=marcodiri
           -Dsonar.host.url=https://sonarcloud.io
