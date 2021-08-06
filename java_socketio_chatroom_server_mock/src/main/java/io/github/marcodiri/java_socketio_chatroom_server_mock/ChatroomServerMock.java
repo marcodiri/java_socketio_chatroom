@@ -4,6 +4,12 @@ import io.socket.emitter.Emitter.Listener;
 import io.socket.socketio.server.SocketIoNamespace;
 import io.socket.socketio.server.SocketIoSocket;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -15,6 +21,8 @@ public class ChatroomServerMock {
     private final SocketIoNamespace namespace;
 
     private SocketIoSocket socket;
+    
+    private ConcurrentMap<String, List<Listener>> handlersToAttach = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LogManager.getLogger(ChatroomServerMock.class);
 
@@ -38,6 +46,12 @@ public class ChatroomServerMock {
 		handleNamespaceEvent("connection", args -> {
 			socket = (SocketIoSocket) args[0];
 			LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
+			for (String event : handlersToAttach.keySet()) {
+				for (Listener fn : handlersToAttach.get(event)) {
+					socket.on(event, fn);
+				}
+			}
+			handlersToAttach.clear();
 		});
     }
     
@@ -51,11 +65,15 @@ public class ChatroomServerMock {
             socket.on(event, fn);
             LOGGER.info("Added listener to server for event: {}", event);
         } else {
-            throw new NullPointerException("socket is null");
+        	if (handlersToAttach.containsKey(event)) {
+        		handlersToAttach.get(event).add(fn);
+        	} else {
+        		handlersToAttach.put(event, new ArrayList<>(Arrays.asList(fn)));
+        	}
         }
     }
 
-    public void sendEvent(String event, JSONObject msg) throws NullPointerException {
+	public void sendEvent(String event, JSONObject msg) throws NullPointerException {
         if (socket != null) {
             socket.send(event, msg);
             LOGGER.info("Sent {event: \"{}\", message: \"{}\"} to Socket {}", event, msg, socket.getId());
@@ -76,5 +94,9 @@ public class ChatroomServerMock {
     public SocketIoSocket getSocket() {
         return socket;
     }
+
+    public ConcurrentMap<String, List<Listener>> getHandlersToAttach() {
+		return handlersToAttach;
+	}
 
 }
