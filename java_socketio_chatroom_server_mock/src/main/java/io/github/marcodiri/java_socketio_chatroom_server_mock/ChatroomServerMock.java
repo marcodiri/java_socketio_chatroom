@@ -8,8 +8,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class ChatroomServerMock {
 
     private final ServerWrapper serverWrapper;
@@ -17,8 +15,6 @@ public class ChatroomServerMock {
     private final SocketIoNamespace namespace;
 
     private SocketIoSocket socket;
-
-    private final AtomicBoolean socketIsInRoom = new AtomicBoolean(false);
 
     private static final Logger LOGGER = LogManager.getLogger(ChatroomServerMock.class);
 
@@ -42,17 +38,7 @@ public class ChatroomServerMock {
 		handleNamespaceEvent("connection", args -> {
 			socket = (SocketIoSocket) args[0];
 			LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
-			handleClientJoin();
-			handleClientLeave();
 		});
-    }
-
-    private void handleClientJoin() throws NullPointerException {
-        handleEvent("join", arg -> socketIsInRoom.set(true));
-    }
-
-    private void handleClientLeave() throws NullPointerException {
-        handleEvent("leave", arg -> socketIsInRoom.set(false));
     }
     
     public void handleNamespaceEvent(String event, Listener fn) {
@@ -90,10 +76,5 @@ public class ChatroomServerMock {
     public SocketIoSocket getSocket() {
         return socket;
     }
-
-    public AtomicBoolean socketIsInRoom() {
-        return socketIsInRoom;
-    }
-
 
 }
