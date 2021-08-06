@@ -76,7 +76,7 @@ public class ChatroomClient {
 
     class ChatroomClientHandlers {
 
-        void connectedHandler() {
+        void connectedHandler() throws NullPointerException{
             LOGGER.debug(() -> "Received {event: \"connected\"} from Server");
             if (username != null) {
                 LOGGER.info("Socket succesfully connected to Server");
@@ -87,6 +87,8 @@ public class ChatroomClient {
                 socket.on("msg", arg -> handleMessage(new ClientMessage((JSONObject) arg[0])));
                 socket.on("error", arg -> handleError(((JSONObject) arg[0]).getString("message")));
                 connected.set(true);
+            } else {
+                throw new NullPointerException("Username is null");
             }
         }
 

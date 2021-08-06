@@ -15,8 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -134,6 +133,15 @@ public class ChatroomClientHandlersTest {
         assertThat(client.getSocket().hasListeners("joined")).isTrue();
         assertThat(client.getSocket().hasListeners("error")).isTrue();
     }
+
+    @Test
+    public void testConnectedHandlerIfUsernameIsNull() {
+        assertThat(client.username).isNull();
+
+        assertThatThrownBy(() -> handlers.connectedHandler()).isInstanceOf(NullPointerException.class)
+                .hasMessage("Username is null");
+    }
+
 
     @Test
     public void testDisconnectHandler() {

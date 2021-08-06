@@ -4,9 +4,7 @@ import io.socket.emitter.Emitter.Listener;
 import io.socket.socketio.server.SocketIoNamespace;
 import io.socket.socketio.server.SocketIoSocket;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -46,9 +44,9 @@ public class ChatroomServerMock {
 		handleNamespaceEvent("connection", args -> {
 			socket = (SocketIoSocket) args[0];
 			LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
-			for (String event : handlersToAttach.keySet()) {
-				for (Listener fn : handlersToAttach.get(event)) {
-					socket.on(event, fn);
+			for (Map.Entry<String, List<Listener>> event : handlersToAttach.entrySet()) {
+				for (Listener fn : handlersToAttach.get(event.getKey())) {
+					socket.on(event.getKey(), fn);
 				}
 			}
 			handlersToAttach.clear();
@@ -68,7 +66,7 @@ public class ChatroomServerMock {
         	if (handlersToAttach.containsKey(event)) {
         		handlersToAttach.get(event).add(fn);
         	} else {
-        		handlersToAttach.put(event, new ArrayList<>(Arrays.asList(fn)));
+        		handlersToAttach.put(event, new ArrayList<>(Collections.singletonList(fn)));
         	}
         }
     }
