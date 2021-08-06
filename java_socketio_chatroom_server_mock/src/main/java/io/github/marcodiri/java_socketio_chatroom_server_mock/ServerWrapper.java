@@ -67,6 +67,10 @@ public class ServerWrapper {
     SocketIoServer getSocketIoServer() {
         return mSocketIoServer;
     }
+    
+    boolean isStarted() {
+    	return mServer.isStarted();
+    }
 
     void startServer() throws Exception {
         mServer.start();

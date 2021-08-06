@@ -39,12 +39,12 @@ public class ChatroomServerMock {
     }
 
     private void handleConnections() {
-        namespace.on("connection", args -> {
-            socket = (SocketIoSocket) args[0];
-            LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
-            handleClientJoin();
-            handleClientLeave();
-        });
+		handleNamespaceEvent("connection", args -> {
+			socket = (SocketIoSocket) args[0];
+			LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
+			handleClientJoin();
+			handleClientLeave();
+		});
     }
 
     private void handleClientJoin() throws NullPointerException {
@@ -53,6 +53,11 @@ public class ChatroomServerMock {
 
     private void handleClientLeave() throws NullPointerException {
         handleEvent("leave", arg -> socketIsInRoom.set(false));
+    }
+    
+    public void handleNamespaceEvent(String event, Listener fn) {
+        namespace.on(event, fn);
+        LOGGER.info("Added listener to server namespace for event: {}", event);
     }
 
     public void handleEvent(String event, Listener fn) throws NullPointerException {
@@ -72,6 +77,11 @@ public class ChatroomServerMock {
             throw new NullPointerException("socket is null");
         }
     }
+    
+    public boolean isStarted() {
+    	return serverWrapper.isStarted();
+    }
+
 
     public SocketIoNamespace getNamespace() {
         return namespace;

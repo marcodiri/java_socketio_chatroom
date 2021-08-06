@@ -37,22 +37,38 @@ public class ChatroomServerMockTest {
         clientSocket.disconnect();
         serverMock.stop();
     }
-
+    
     @Test
-    public void testHandleConnections() {
-        assertThat(serverMock.getNamespace().hasListeners("connection")).isTrue();
+    public void testStart() {
+    	assertThat(serverMock.getNamespace().hasListeners("connection")).isTrue();
 
-        clientSocket.connect();
-        try {
-            await().atMost(2, SECONDS).until(() -> clientSocket.connected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not connect to server");
-        }
-
-        assertThat(serverMock.getSocket()).isNotNull();
-        assertThat(serverMock.getSocket().getId()).isEqualTo(clientSocket.id());
-        assertThat(serverMock.getSocket().hasListeners("join")).isTrue();
-        assertThat(serverMock.getSocket().hasListeners("leave")).isTrue();
+    	try {
+    		await().atMost(2, SECONDS).until(() -> serverMock.isStarted());
+    	} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+    		fail("Server cannot be started");
+    	}
+    	
+    	clientSocket.connect();
+    	try {
+    		await().atMost(2, SECONDS).until(() -> clientSocket.connected());
+    	} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+    		fail("Client could not connect to server");
+    	}
+    	
+    	assertThat(serverMock.getSocket()).isNotNull();
+    	assertThat(serverMock.getSocket().getId()).isEqualTo(clientSocket.id());
+    	assertThat(serverMock.getSocket().hasListeners("join")).isTrue();
+    	assertThat(serverMock.getSocket().hasListeners("leave")).isTrue();
+    }
+    
+    @Test
+    public void testStop() throws Exception {
+    	serverMock.stop();
+    	try {
+    		await().atMost(2, SECONDS).until(() -> !serverMock.isStarted());
+    	} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+    		fail("Server cannot be stopped");
+    	}
     }
 
     @Test
@@ -90,6 +106,13 @@ public class ChatroomServerMockTest {
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Client could not leave the room");
         }
+    }
+
+    @Test
+    public void testHandleNamespaceEvent() {
+    	serverMock.handleNamespaceEvent("event", args -> {});
+    	
+        assertThat(serverMock.getNamespace().hasListeners("event")).isTrue();
     }
 
     @Test
