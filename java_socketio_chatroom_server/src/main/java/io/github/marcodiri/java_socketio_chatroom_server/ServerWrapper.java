@@ -76,4 +76,8 @@ public class ServerWrapper {
     void stopServer() throws Exception {
         mServer.stop();
     }
+
+    boolean isStarted() {
+        return mServer.isStarted();
+    }
 }
