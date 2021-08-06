@@ -5,14 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.net.SocketException;
 import java.net.URI;
 import java.sql.Timestamp;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.socket.client.Socket;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -24,6 +25,7 @@ import io.socket.client.IO;
 
 public class ChatroomClientTest {
 
+    private ChatroomClient.ChatroomClientHandlers handlers;
     private ClientView view;
 
     private ChatroomClient client;
@@ -33,7 +35,8 @@ public class ChatroomClientTest {
     @Before
     public void setup() {
         view = mock(ClientView.class);
-        client = new ChatroomClient(URI.create("http://localhost:3000"), IO.Options.builder().build(), view);
+        handlers = mock(ChatroomClient.ChatroomClientHandlers.class);
+        client = new ChatroomClient(URI.create("http://localhost:3000"), IO.Options.builder().build(), handlers, view);
 
         serverMock = new ChatroomServerMock();
         try {
@@ -54,41 +57,62 @@ public class ChatroomClientTest {
     }
 
     @Test
-    public void testConnect() {
-        client.connect("user");
+    public void testInit() {
+        assertThat(client.getSocket().hasListeners("connected")).isTrue();
+        assertThat(client.getSocket().hasListeners(Socket.EVENT_DISCONNECT)).isTrue();
+
+        serverMock.handleNamespaceEvent("connection", arg -> serverMock.getSocket().send("connected"));
+
+        client.getSocket().connect();
+
         try {
-            await().atMost(2, SECONDS).untilTrue(serverMock.socketIsInRoom());
+            await().atMost(2, SECONDS).untilAsserted(() -> verify(handlers).connectedHandler());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Socket could not join the room");
+            fail("connectedHandler not called");
         }
 
-        assertThat(client.getSocket().hasListeners("msg")).isTrue();
-        assertThat(client.getSocket().hasListeners("joined")).isTrue();
-        assertThat(client.getSocket().hasListeners("error")).isTrue();
+        client.getSocket().disconnect();
+
+        try {
+            await().atMost(2, SECONDS).untilAsserted(() -> verify(handlers).disconnectedHandler());
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("disconnectedHandler not called");
+        }
+
+    }
+
+    @Test
+    public void testConnect() {
+        String username = "user";
+
+        client.connect(username);
+
+        try {
+            await().atMost(2, SECONDS).until(() -> client.getSocket().connected());
+        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
+            fail("Client cannot connect to server");
+        }
+
+        assertThat(client.username).isEqualTo(username);
     }
 
     @Test
     public void testDisconnect() {
-        client.getSocket().on("event1", args -> {
-        });
-        client.getSocket().on("event2", args -> {
-        });
         client.getSocket().connect();
         try {
-            await().atMost(2, SECONDS).until(() -> client.isConnected());
+            await().atMost(2, SECONDS).until(() -> client.getSocket().connected());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Cannot connect to server");
         }
 
         client.disconnect();
         try {
-            await().atMost(2, SECONDS).until(() -> !client.isConnected());
+            await().atMost(2, SECONDS).until(() -> !client.getSocket().connected());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Cannot disconnect from server");
         }
 
-        assertThat(client.getSocket().hasListeners("event1")).isFalse();
-        assertThat(client.getSocket().hasListeners("event2")).isFalse();
+        assertThat(client.username).isNull();
     }
 
     @Test
@@ -101,20 +125,19 @@ public class ChatroomClientTest {
 
     @Test
     public void testSendMessageWhenClientConnected() {
+        AtomicReference<JSONObject> receivedMsg = new AtomicReference<>();
+
+        serverMock.handleNamespaceEvent("connection", arg -> serverMock.getSocket().send("connected"));
+        serverMock.handleEvent("msg", arg -> receivedMsg.set((JSONObject) arg[0]));
+
         client.getSocket().connect();
         try {
-            await().atMost(2, SECONDS).until(() -> client.isConnected());
+            await().atMost(2, SECONDS).until(() -> client.getSocket().connected());
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Client could not connect to server");
         }
 
-        AtomicReference<JSONObject> receivedMsg = new AtomicReference<>();
-
-        try {
-            serverMock.handleEvent("msg", arg -> receivedMsg.set((JSONObject) arg[0]));
-        } catch (NullPointerException e) {
-            fail("Socket is not connected to server");
-        }
+        client.connected.set(true);
 
         ClientMessage msg = new ClientMessage(new Timestamp(0), "user", "message");
         try {
@@ -124,74 +147,10 @@ public class ChatroomClientTest {
         }
 
         try {
+            await().atMost(2, SECONDS).untilAsserted(() -> assertThat(receivedMsg.get()).isNotNull());
             await().atMost(2, SECONDS).until(() -> msg.equals(new ClientMessage(receivedMsg.get())));
         } catch (org.awaitility.core.ConditionTimeoutException ignored) {
             fail("Server did not receive the correct message");
-        }
-    }
-
-    @Test
-    public void testHandleMessage() {
-        client.getSocket().connect();
-        client.handleMessage();
-        try {
-            await().atMost(2, SECONDS).until(() -> client.isConnected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not connect to server");
-        }
-
-        ClientMessage msg = new ClientMessage(new Timestamp(0), "user", "message");
-        try {
-            serverMock.sendEvent("msg", msg.toJSON());
-        } catch (NullPointerException e) {
-            fail("Socket is null");
-        }
-
-        try {
-            await().atMost(2, SECONDS).untilAsserted(() -> verify(view).addMessage(msg));
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("AddMessage on ClientView was not called");
-        }
-    }
-
-    @Test
-    public void testHandleJoin() {
-        client.getSocket().connect();
-        client.handleJoin();
-        try {
-            await().atMost(2, SECONDS).until(() -> client.isConnected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not connect to server");
-        }
-
-        serverMock.handleEvent("join", arg -> serverMock.sendEvent("joined", new JSONObject("{roomName: RoomName}")));
-        client.getSocket().emit("join");
-
-        try {
-            await().atMost(2, SECONDS).untilAsserted(() -> verify(view).roomJoined("RoomName"));
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("roomJoined on ClientView was not called");
-        }
-
-    }
-
-    @Test
-    public void testHandleError() {
-        client.getSocket().connect();
-        client.handleError();
-        try {
-            await().atMost(2, SECONDS).until(() -> client.isConnected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not connect to server");
-        }
-
-        String errorMessage = "Username is already taken";
-        serverMock.sendEvent("error", new JSONObject("{message: " + errorMessage + "}"));
-
-        try {
-            await().atMost(2, SECONDS).untilAsserted(() -> verify(view).showError(errorMessage));
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("showError on ClientView was not called or message is invalid");
         }
     }
 
