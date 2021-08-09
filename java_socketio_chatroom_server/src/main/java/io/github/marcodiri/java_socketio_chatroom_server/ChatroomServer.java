@@ -18,113 +18,113 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatroomServer {
 
-    private static final String CHATROOM_NAME = "Chatroom";
+	private static final String CHATROOM_NAME = "Chatroom";
 
-    private final ServerWrapper serverWrapper;
+	private final ServerWrapper serverWrapper;
 
-    private final SocketIoNamespace namespace;
-    private final ServerRepository repository;
+	private final SocketIoNamespace namespace;
+	private final ServerRepository repository;
 
-    private final ConcurrentHashMap<String, String> usernameList;
+	private final ConcurrentHashMap<String, String> usernameList;
 
-    private static final Logger LOGGER = LogManager.getLogger(ChatroomServer.class);
+	private static final Logger LOGGER = LogManager.getLogger(ChatroomServer.class);
 
-    public ChatroomServer(ServerRepository repository) {
-        this.serverWrapper = new ServerWrapper();
-        this.namespace = serverWrapper.getSocketIoServer().namespace("/");
-        this.repository = repository;
-        this.usernameList = new ConcurrentHashMap<>();
-    }
+	public ChatroomServer(ServerRepository repository) {
+		this.serverWrapper = new ServerWrapper();
+		this.namespace = serverWrapper.getSocketIoServer().namespace("/");
+		this.repository = repository;
+		this.usernameList = new ConcurrentHashMap<>();
+	}
 
-    public void start() throws Exception {
-        handleConnections();
-        serverWrapper.startServer();
-        LOGGER.info("Server started");
-    }
+	public void start() throws Exception {
+		handleConnections();
+		serverWrapper.startServer();
+		LOGGER.info("Server started");
+	}
 
-    public void stop() throws Exception {
-        serverWrapper.stopServer();
-        usernameList.clear();
-        LOGGER.info("Server stopped");
-    }
+	public void stop() throws Exception {
+		serverWrapper.stopServer();
+		usernameList.clear();
+		LOGGER.info("Server stopped");
+	}
 
-    private void handleConnections() {
-        namespace.on("connection", args -> {
-            final SocketIoSocket socket = (SocketIoSocket) args[0];
-            LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
-            handleClientJoin(socket);
-            handleClientMessage(socket, namespace);
-            handleClientDisconnect(socket);
-            socket.send("connected");
-            LOGGER.debug(() -> String.format("Sent {event: \"connected\"} to Socket %s", socket.getId()));
-        });
-    }
+	private void handleConnections() {
+		namespace.on("connection", args -> {
+			final SocketIoSocket socket = (SocketIoSocket) args[0];
+			LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
+			handleClientJoin(socket);
+			handleClientMessage(socket, namespace);
+			handleClientDisconnect(socket);
+			socket.send("connected");
+			LOGGER.debug(() -> String.format("Sent {event: \"connected\"} to Socket %s", socket.getId()));
+		});
+	}
 
-    private void handleClientJoin(SocketIoSocket socket) {
-        socket.on("join", arg -> {
-            LOGGER.info(String.format("Socket %s is trying to join the room", socket.getId()));
-            if (!socketIsInRoom(socket)) {
-                if (usernameList.containsValue(arg[0].toString())) {
-                    sendError(socket, "Username is already taken");
-                } else {
-                    socket.joinRoom(CHATROOM_NAME);
-                    usernameList.put(socket.getId(), (String) arg[0]);
-                    socket.send("joined", new JSONObject("{roomName: " + CHATROOM_NAME + "}"));
-                    LOGGER.info(String.format("Socket %s joined the room", socket.getId()));
-                    LOGGER.debug(() -> String.format("Sent {event: \"joined\", message: \"{roomName: %s}\"} to Socket %s", CHATROOM_NAME, socket.getId()));
-                    List<Message> history = repository.findAll();
-                    for (Message message : history) {
-                        socket.send("msg", message.toJSON());
-                        LOGGER.debug(() -> String.format("Sent {event: \"msg\", message: \"%s\"} to Socket %s", message.toJSON(), socket.getId()));
-                    }
-                }
-            }
-        });
-    }
+	private void handleClientJoin(SocketIoSocket socket) {
+		socket.on("join", arg -> {
+			LOGGER.info(String.format("Socket %s is trying to join the room", socket.getId()));
+			if (!socketIsInRoom(socket)) {
+				if (usernameList.containsValue(arg[0].toString())) {
+					sendError(socket, "Username is already taken");
+				} else {
+					socket.joinRoom(CHATROOM_NAME);
+					usernameList.put(socket.getId(), (String) arg[0]);
+					socket.send("joined", new JSONObject("{roomName: " + CHATROOM_NAME + "}"));
+					LOGGER.info(String.format("Socket %s joined the room", socket.getId()));
+					LOGGER.debug(() -> String.format("Sent {event: \"joined\", message: \"{roomName: %s}\"} to Socket %s", CHATROOM_NAME, socket.getId()));
+					List<Message> history = repository.findAll();
+					for (Message message : history) {
+						socket.send("msg", message.toJSON());
+						LOGGER.debug(() -> String.format("Sent {event: \"msg\", message: \"%s\"} to Socket %s", message.toJSON(), socket.getId()));
+					}
+				}
+			}
+		});
+	}
 
-    private void handleClientMessage(SocketIoSocket socket, SocketIoNamespace namespace) {
-        socket.on("msg", arg -> {
-            LOGGER.info(String.format("Message received from Socket %s", socket.getId()));
-            LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} to Socket %s", arg[0], socket.getId()));
-            if (socketIsInRoom(socket)) {
-                namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
-                LOGGER.info("Message broadcasted to clients");
-                JSONObject jsonMsg = (JSONObject) arg[0];
-                Message incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
-                repository.save(incomingMessage);
-            }
-        });
-    }
+	private void handleClientMessage(SocketIoSocket socket, SocketIoNamespace namespace) {
+		socket.on("msg", arg -> {
+			LOGGER.info(String.format("Message received from Socket %s", socket.getId()));
+			LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} to Socket %s", arg[0], socket.getId()));
+			if (socketIsInRoom(socket)) {
+				namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
+				LOGGER.info("Message broadcasted to clients");
+				JSONObject jsonMsg = (JSONObject) arg[0];
+				Message incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
+				repository.save(incomingMessage);
+			}
+		});
+	}
 
-    private void handleClientDisconnect(SocketIoSocket socket) {
-        socket.on("disconnect", arg -> {
-            LOGGER.debug(() -> String.format("Received {event: \"disconnect\"} from Socket %s", socket.getId()));
-            socket.leaveRoom(CHATROOM_NAME);
-            usernameList.remove(socket.getId());
-            LOGGER.info(String.format("Socket %s removed from room", socket.getId()));
-        });
-    }
+	private void handleClientDisconnect(SocketIoSocket socket) {
+		socket.on("disconnect", arg -> {
+			LOGGER.debug(() -> String.format("Received {event: \"disconnect\"} from Socket %s", socket.getId()));
+			socket.leaveRoom(CHATROOM_NAME);
+			usernameList.remove(socket.getId());
+			LOGGER.info(String.format("Socket %s removed from room", socket.getId()));
+		});
+	}
 
-    public boolean isStarted() {
-        return serverWrapper.isStarted();
-    }
+	public boolean isStarted() {
+		return serverWrapper.isStarted();
+	}
 
-    SocketIoNamespace getNamespace() {
-        return namespace;
-    }
+	SocketIoNamespace getNamespace() {
+		return namespace;
+	}
 
-    public Map<String, String> getUsernameList() {
-        return usernameList;
-    }
+	public Map<String, String> getUsernameList() {
+		return usernameList;
+	}
 
-    private boolean socketIsInRoom(SocketIoSocket socket) {
-        return Arrays.asList(namespace.getAdapter().listClientRooms(socket)).contains(CHATROOM_NAME);
-    }
+	private boolean socketIsInRoom(SocketIoSocket socket) {
+		return Arrays.asList(namespace.getAdapter().listClientRooms(socket)).contains(CHATROOM_NAME);
+	}
 
-    private void sendError(SocketIoSocket socket, String errorMessage) {
-        socket.send("error", new JSONObject("{message: " + errorMessage + "}"));
-        LOGGER.info("Sent error [{}] to Socket {}", errorMessage, socket.getId());
-        LOGGER.debug(() -> String.format("Sent {event: \"error\", message: \"%s\"} to Socket %s", errorMessage, socket.getId()));
-    }
+	private void sendError(SocketIoSocket socket, String errorMessage) {
+		socket.send("error", new JSONObject("{message: " + errorMessage + "}"));
+		LOGGER.info("Sent error [{}] to Socket {}", errorMessage, socket.getId());
+		LOGGER.debug(() -> String.format("Sent {event: \"error\", message: \"%s\"} to Socket %s", errorMessage, socket.getId()));
+	}
 
 }

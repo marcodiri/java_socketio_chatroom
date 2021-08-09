@@ -29,7 +29,7 @@ import com.mongodb.ServerAddress;
 @RunWith(GUITestRunner.class)
 public class MultipleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 
-    public static final String CHATROOM_DB_NAME = "chatroom";
+	public static final String CHATROOM_DB_NAME = "chatroom";
 
 	private static final String MESSAGE_1_USER = "user1";
 	private static final String MESSAGE_1_TEXT = "text1";
@@ -68,19 +68,19 @@ public class MultipleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 
 		// get a reference of Clients JFrame
 		try {
-            await().atMost(5, SECONDS).until(() -> {
-            	frames = new ArrayList<>();
-            	Frame[] fs = Frame.getFrames();
-            	for (Frame f : fs) {
+			await().atMost(5, SECONDS).until(() -> {
+				frames = new ArrayList<>();
+				Frame[] fs = Frame.getFrames();
+				for (Frame f : fs) {
 					if ("Socket.io Chatroom".equals(f.getTitle()) && f.isShowing()) {
-            			frames.add(f);
+						frames.add(f);
 					}
-            	}
-            	return frames.size() == 2;
-            });
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail(String.format("Expected [2] frames but got [%d]", frames.size()));
-        }
+				}
+				return frames.size() == 2;
+			});
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail(String.format("Expected [2] frames but got [%d]", frames.size()));
+		}
 	}
 
 	@Override
@@ -112,16 +112,16 @@ public class MultipleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 
 		txtUsername1.enterText(MESSAGE_1_USER);
 		btnConnect1.click();
-		
+
 		try {
 			await().atMost(5, SECONDS).untilAsserted(txtMessage1::requireEnabled);
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Client1 message text box not enabled");
 		}
-		
+
 		txtUsername2.enterText(MESSAGE_2_USER);
 		btnConnect2.click();
-		
+
 		try {
 			await().atMost(2, SECONDS).untilAsserted(txtMessage2::requireEnabled);
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
@@ -166,7 +166,7 @@ public class MultipleChatroomClientE2E extends AssertJSwingJUnitTestCase {
 
 		JButtonFixture btnConnect2 = window2.button(JButtonMatcher.withText("Connect"));
 		JTextComponentFixture txtUsername2 = window2.textBox("txtUsername");
-        JTextComponentFixture txtErrorMessage2 = window2.textBox("txtErrorMessage");
+		JTextComponentFixture txtErrorMessage2 = window2.textBox("txtErrorMessage");
 
 		txtUsername1.enterText(MESSAGE_1_USER);
 		btnConnect1.click();

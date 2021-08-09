@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -132,8 +132,8 @@
 		<profile>
 			<id>jacoco</id>
 			<activation>
-				<!-- Activated when the system property "skipCoverage" is not defined 
-					at all or is defined with a value which is not "true", thus, implicitly active 
+				<!-- Activated when the system property "skipCoverage" is not defined
+					at all or is defined with a value which is not "true", thus, implicitly active
 					by default -->
 				<property>
 					<name>skipCoverage</name>
@@ -169,13 +169,16 @@
 								<param>io.github.marcodiri.java_socketio_chatroom_client.model.*</param>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.App</param>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.view.ClientView</param>
-								<param>io.github.marcodiri.java_socketio_chatroom_client.view.swing.ClientSwingView*</param>
+								<param>io.github.marcodiri.java_socketio_chatroom_client.view.swing.ClientSwingView*
+								</param>
 							</excludedClasses>
 							<targetTests>
 								<param>io.github.marcodiri.java_socketio_chatroom_client.*Test</param>
 							</targetTests>
 							<excludedTestClasses>
-								<param>io.github.marcodiri.java_socketio_chatroom_client.view.swing.ClientSwingViewTest</param>
+								<param>
+									io.github.marcodiri.java_socketio_chatroom_client.view.swing.ClientSwingViewTest
+								</param>
 							</excludedTestClasses>
 						</configuration>
 						<executions>

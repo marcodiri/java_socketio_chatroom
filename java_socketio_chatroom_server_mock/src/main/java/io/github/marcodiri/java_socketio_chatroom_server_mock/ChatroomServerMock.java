@@ -14,33 +14,33 @@ import org.json.JSONObject;
 
 public class ChatroomServerMock {
 
-    private final ServerWrapper serverWrapper;
+	private final ServerWrapper serverWrapper;
 
-    private final SocketIoNamespace namespace;
+	private final SocketIoNamespace namespace;
 
-    private SocketIoSocket socket;
-    
-    private ConcurrentMap<String, List<Listener>> handlersToAttach = new ConcurrentHashMap<>();
+	private SocketIoSocket socket;
 
-    private static final Logger LOGGER = LogManager.getLogger(ChatroomServerMock.class);
+	private ConcurrentMap<String, List<Listener>> handlersToAttach = new ConcurrentHashMap<>();
 
-    public ChatroomServerMock() {
-        this.serverWrapper = new ServerWrapper();
-        this.namespace = serverWrapper.getSocketIoServer().namespace("/");
-    }
+	private static final Logger LOGGER = LogManager.getLogger(ChatroomServerMock.class);
 
-    public void start() throws Exception {
-        handleConnections();
-        serverWrapper.startServer();
-        LOGGER.info("Server started");
-    }
+	public ChatroomServerMock() {
+		this.serverWrapper = new ServerWrapper();
+		this.namespace = serverWrapper.getSocketIoServer().namespace("/");
+	}
 
-    public void stop() throws Exception {
-        serverWrapper.stopServer();
-        LOGGER.info("Server stopped");
-    }
+	public void start() throws Exception {
+		handleConnections();
+		serverWrapper.startServer();
+		LOGGER.info("Server started");
+	}
 
-    private void handleConnections() {
+	public void stop() throws Exception {
+		serverWrapper.stopServer();
+		LOGGER.info("Server stopped");
+	}
+
+	private void handleConnections() {
 		handleNamespaceEvent("connection", args -> {
 			socket = (SocketIoSocket) args[0];
 			LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
@@ -51,49 +51,49 @@ public class ChatroomServerMock {
 			}
 			handlersToAttach.clear();
 		});
-    }
-    
-    public void handleNamespaceEvent(String event, Listener fn) {
-        namespace.on(event, fn);
-        LOGGER.info("Added listener to server namespace for event: {}", event);
-    }
+	}
 
-    public void handleEvent(String event, Listener fn) throws NullPointerException {
-        if (socket != null) {
-            socket.on(event, fn);
-            LOGGER.info("Added listener to server for event: {}", event);
-        } else {
-        	if (handlersToAttach.containsKey(event)) {
-        		handlersToAttach.get(event).add(fn);
-        	} else {
-        		handlersToAttach.put(event, new ArrayList<>(Collections.singletonList(fn)));
-        	}
-        }
-    }
+	public void handleNamespaceEvent(String event, Listener fn) {
+		namespace.on(event, fn);
+		LOGGER.info("Added listener to server namespace for event: {}", event);
+	}
+
+	public void handleEvent(String event, Listener fn) throws NullPointerException {
+		if (socket != null) {
+			socket.on(event, fn);
+			LOGGER.info("Added listener to server for event: {}", event);
+		} else {
+			if (handlersToAttach.containsKey(event)) {
+				handlersToAttach.get(event).add(fn);
+			} else {
+				handlersToAttach.put(event, new ArrayList<>(Collections.singletonList(fn)));
+			}
+		}
+	}
 
 	public void sendEvent(String event, JSONObject msg) throws NullPointerException {
-        if (socket != null) {
-            socket.send(event, msg);
-            LOGGER.info("Sent {event: \"{}\", message: \"{}\"} to Socket {}", event, msg, socket.getId());
-        } else {
-            throw new NullPointerException("socket is null");
-        }
-    }
-    
-    public boolean isStarted() {
-    	return serverWrapper.isStarted();
-    }
+		if (socket != null) {
+			socket.send(event, msg);
+			LOGGER.info("Sent {event: \"{}\", message: \"{}\"} to Socket {}", event, msg, socket.getId());
+		} else {
+			throw new NullPointerException("socket is null");
+		}
+	}
+
+	public boolean isStarted() {
+		return serverWrapper.isStarted();
+	}
 
 
-    public SocketIoNamespace getNamespace() {
-        return namespace;
-    }
+	public SocketIoNamespace getNamespace() {
+		return namespace;
+	}
 
-    public SocketIoSocket getSocket() {
-        return socket;
-    }
+	public SocketIoSocket getSocket() {
+		return socket;
+	}
 
-    public ConcurrentMap<String, List<Listener>> getHandlersToAttach() {
+	public ConcurrentMap<String, List<Listener>> getHandlersToAttach() {
 		return handlersToAttach;
 	}
 

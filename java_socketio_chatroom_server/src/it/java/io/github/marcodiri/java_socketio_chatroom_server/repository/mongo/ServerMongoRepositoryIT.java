@@ -53,36 +53,36 @@ public class ServerMongoRepositoryIT {
 	public void testFindAll() {
 		Timestamp ts1 = new Timestamp(0);
 		Timestamp ts2 = new Timestamp(1);
-		
+
 		messagesCollection.insertMany(asList(
 				new Document()
-				.append("timestamp", ts1.getTime())
-				.append("user", "user1")
-				.append("message", "message1"),
+						.append("timestamp", ts1.getTime())
+						.append("user", "user1")
+						.append("message", "message1"),
 				new Document()
-				.append("timestamp", ts2.getTime())
-				.append("user", "user2")
-				.append("message", "message2")
-				));
+						.append("timestamp", ts2.getTime())
+						.append("user", "user2")
+						.append("message", "message2")
+		));
 
 		assertThat(serverRepository.findAll())
-			.containsExactly(
-					new ServerMessage(ts1, "user1", "message1"),
-					new ServerMessage(ts2, "user2", "message2")
-					);
+				.containsExactly(
+						new ServerMessage(ts1, "user1", "message1"),
+						new ServerMessage(ts2, "user2", "message2")
+				);
 	}
-	
+
 	@Test
 	public void testSave() {
 		ServerMessage msg = new ServerMessage(new Timestamp(0), "user", "message");
 		serverRepository.save(msg);
 		assertThat(readAllMessages()).containsExactly(msg);
 	}
-	
+
 	private List<ServerMessage> readAllMessages() {
 		return StreamSupport.stream(messagesCollection.find().spliterator(), false)
 				.map(d -> new ServerMessage(
-						new Timestamp(Long.parseLong(d.get("timestamp").toString())), 
+						new Timestamp(Long.parseLong(d.get("timestamp").toString())),
 						"" + d.get("user"),
 						"" + d.get("message")))
 				.collect(Collectors.toList());

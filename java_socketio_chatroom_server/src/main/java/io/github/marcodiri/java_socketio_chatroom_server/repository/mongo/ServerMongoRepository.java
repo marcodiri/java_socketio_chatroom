@@ -30,7 +30,7 @@ public class ServerMongoRepository implements ServerRepository {
 
 	@Override
 	public List<Message> findAll() {
-        LOGGER.info("Retrieving all messages from db");
+		LOGGER.info("Retrieving all messages from db");
 		return StreamSupport.
 				stream(msgCollection.find().spliterator(), false)
 				.map(this::fromDocumentToMessage)
@@ -41,17 +41,17 @@ public class ServerMongoRepository implements ServerRepository {
 	public void save(Message message) {
 		msgCollection.insertOne(
 				new Document()
-				.append("timestamp", message.getTimestamp().getTime())
-				.append("user", message.getUser())
-				.append("message", message.getUserMessage()));
-        LOGGER.info("Saved {} in db", message);
+						.append("timestamp", message.getTimestamp().getTime())
+						.append("user", message.getUser())
+						.append("message", message.getUserMessage()));
+		LOGGER.info("Saved {} in db", message);
 	}
 
 	private Message fromDocumentToMessage(Document d) {
 		return new ServerMessage(
-				new Timestamp(Long.parseLong(d.get("timestamp").toString())), 
-				""+d.get("user"), 
-				""+d.get("message"));
+				new Timestamp(Long.parseLong(d.get("timestamp").toString())),
+				"" + d.get("user"),
+				"" + d.get("message"));
 	}
 
 }

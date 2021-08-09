@@ -8,19 +8,19 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public final class ClientMessage extends Message {
-	
+
 	public ClientMessage(Timestamp timestamp, String user, String message) {
-        super(timestamp, user, message);
+		super(timestamp, user, message);
 	}
 
 	public ClientMessage(JSONObject jsonMsg) {
-        super(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
-    }
+		super(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
+	}
 
-    @Override
-    public String getFormattedMessage() {
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-        return dateFormat.format(this.getTimestamp()) + " " + this.getUser() + ": " + this.getUserMessage();
-    }
+	@Override
+	public String getFormattedMessage() {
+		DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+		return dateFormat.format(this.getTimestamp()) + " " + this.getUser() + ": " + this.getUserMessage();
+	}
 
 }

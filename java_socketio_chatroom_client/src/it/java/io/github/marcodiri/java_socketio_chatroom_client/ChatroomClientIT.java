@@ -27,74 +27,74 @@ import static org.mockito.Mockito.when;
 
 public class ChatroomClientIT {
 
-    @Mock
-    private ServerRepository mongoRepository;
-    @InjectMocks
-    private ChatroomServer chatroomServer;
-    private AutoCloseable closeable;
+	@Mock
+	private ServerRepository mongoRepository;
+	@InjectMocks
+	private ChatroomServer chatroomServer;
+	private AutoCloseable closeable;
 
-    @Mock
-    private ClientView view;
-    private ChatroomClient chatroomClient;
+	@Mock
+	private ClientView view;
+	private ChatroomClient chatroomClient;
 
-    @Before
-    public void setup() {
-        closeable = MockitoAnnotations.openMocks(this);
+	@Before
+	public void setup() {
+		closeable = MockitoAnnotations.openMocks(this);
 
-        try {
-            chatroomServer.start();
-        } catch (Exception ignored) {
-            fail("ServerWrapper startup failed");
-        }
+		try {
+			chatroomServer.start();
+		} catch (Exception ignored) {
+			fail("ServerWrapper startup failed");
+		}
 
-        chatroomClient = new ChatroomClient(URI.create("http://localhost:3000"), IO.Options.builder().build(), view);
-    }
+		chatroomClient = new ChatroomClient(URI.create("http://localhost:3000"), IO.Options.builder().build(), view);
+	}
 
-    @After
-    public void closeConnections() throws Exception {
-        chatroomClient.disconnect();
-        chatroomServer.stop();
-        closeable.close();
-    }
+	@After
+	public void closeConnections() throws Exception {
+		chatroomClient.disconnect();
+		chatroomServer.stop();
+		closeable.close();
+	}
 
-    @Test
-    public void testRetrieveMsgInRepositoryOnConnection() {
-        Message serverMessage = new ServerMessage(new Timestamp(0), "user", "message");
-        when(mongoRepository.findAll()).thenReturn(Collections.singletonList(serverMessage));
+	@Test
+	public void testRetrieveMsgInRepositoryOnConnection() {
+		Message serverMessage = new ServerMessage(new Timestamp(0), "user", "message");
+		when(mongoRepository.findAll()).thenReturn(Collections.singletonList(serverMessage));
 
-        chatroomClient.connect("user");
+		chatroomClient.connect("user");
 
-        Message clientMessage = new ClientMessage(serverMessage.toJSON());
-        try {
-            await().atMost(2, SECONDS).untilAsserted(() -> verify(view).addMessage(clientMessage));
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Expected " + clientMessage);
-        }
-    }
+		Message clientMessage = new ClientMessage(serverMessage.toJSON());
+		try {
+			await().atMost(2, SECONDS).untilAsserted(() -> verify(view).addMessage(clientMessage));
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Expected " + clientMessage);
+		}
+	}
 
-    @Test
-    public void testSentMessageAreSavedInRepository() {
-        chatroomClient.connect("user");
-        try {
-            await().atMost(2, SECONDS).until(() -> chatroomClient.isConnected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client cannot connect to server");
-        }
+	@Test
+	public void testSentMessageAreSavedInRepository() {
+		chatroomClient.connect("user");
+		try {
+			await().atMost(2, SECONDS).until(() -> chatroomClient.isConnected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Client cannot connect to server");
+		}
 
-        ClientMessage clientMessage = new ClientMessage(new Timestamp(0), "user", "message");
-        try {
-            chatroomClient.sendMessage(clientMessage);
-        } catch (SocketException e) {
-            fail(e.getMessage());
-        }
+		ClientMessage clientMessage = new ClientMessage(new Timestamp(0), "user", "message");
+		try {
+			chatroomClient.sendMessage(clientMessage);
+		} catch (SocketException e) {
+			fail(e.getMessage());
+		}
 
-        Message serverMessage = new ServerMessage(clientMessage.getTimestamp(), clientMessage.getUser(), clientMessage.getUserMessage());
+		Message serverMessage = new ServerMessage(clientMessage.getTimestamp(), clientMessage.getUser(), clientMessage.getUserMessage());
 
-        try {
-            await().atMost(2, SECONDS).untilAsserted(() -> verify(mongoRepository).save(serverMessage));
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Expected " + serverMessage);
-        }
-    }
+		try {
+			await().atMost(2, SECONDS).untilAsserted(() -> verify(mongoRepository).save(serverMessage));
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Expected " + serverMessage);
+		}
+	}
 
 }

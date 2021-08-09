@@ -24,59 +24,59 @@ import java.io.IOException;
 
 public class ServerWrapper {
 
-    private final Server mServer;
-    private final EngineIoServer mEngineIoServer;
-    private final SocketIoServer mSocketIoServer;
+	private final Server mServer;
+	private final EngineIoServer mEngineIoServer;
+	private final SocketIoServer mSocketIoServer;
 
 	private static final Logger LOGGER = LogManager.getLogger(ServerWrapper.class);
 
-    @SuppressWarnings("serial")
+	@SuppressWarnings("serial")
 	ServerWrapper() {
 
-        mServer = new Server(3000);
-        mEngineIoServer = new EngineIoServer();
-        mSocketIoServer = new SocketIoServer(mEngineIoServer);
+		mServer = new Server(3000);
+		mEngineIoServer = new EngineIoServer();
+		mSocketIoServer = new SocketIoServer(mEngineIoServer);
 
-        System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
-        System.setProperty("org.eclipse.jetty.LEVEL", "OFF");
+		System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
+		System.setProperty("org.eclipse.jetty.LEVEL", "OFF");
 
-        ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        servletContextHandler.setContextPath("/");
+		ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		servletContextHandler.setContextPath("/");
 
-        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
-            @Override
-            protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
-                mEngineIoServer.handleRequest(new HttpServletRequestWrapper(request), response);
-            }
-        }), "/socket.io/*");
+		servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+			@Override
+			protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
+				mEngineIoServer.handleRequest(new HttpServletRequestWrapper(request), response);
+			}
+		}), "/socket.io/*");
 
-        try {
-            WebSocketUpgradeFilter webSocketUpgradeFilter = WebSocketUpgradeFilter.configure(servletContextHandler);
-            webSocketUpgradeFilter.addMapping(
-                    new ServletPathSpec("/socket.io/*"),
-                    (servletUpgradeRequest, servletUpgradeResponse) -> new JettyWebSocketHandler(mEngineIoServer));
-        } catch (ServletException ex) {
-        	LOGGER.warn("WebSocket is not available");
-        }
+		try {
+			WebSocketUpgradeFilter webSocketUpgradeFilter = WebSocketUpgradeFilter.configure(servletContextHandler);
+			webSocketUpgradeFilter.addMapping(
+					new ServletPathSpec("/socket.io/*"),
+					(servletUpgradeRequest, servletUpgradeResponse) -> new JettyWebSocketHandler(mEngineIoServer));
+		} catch (ServletException ex) {
+			LOGGER.warn("WebSocket is not available");
+		}
 
-        HandlerList handlerList = new HandlerList();
-        handlerList.setHandlers(new Handler[]{servletContextHandler});
-        mServer.setHandler(handlerList);
-    }
+		HandlerList handlerList = new HandlerList();
+		handlerList.setHandlers(new Handler[]{servletContextHandler});
+		mServer.setHandler(handlerList);
+	}
 
-    SocketIoServer getSocketIoServer() {
-        return mSocketIoServer;
-    }
-    
-    boolean isStarted() {
-    	return mServer.isStarted();
-    }
+	SocketIoServer getSocketIoServer() {
+		return mSocketIoServer;
+	}
 
-    void startServer() throws Exception {
-        mServer.start();
-    }
+	boolean isStarted() {
+		return mServer.isStarted();
+	}
 
-    void stopServer() throws Exception {
-        mServer.stop();
-    }
+	void startServer() throws Exception {
+		mServer.start();
+	}
+
+	void stopServer() throws Exception {
+		mServer.stop();
+	}
 }

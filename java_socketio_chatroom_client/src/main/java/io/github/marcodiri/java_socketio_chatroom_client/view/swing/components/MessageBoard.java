@@ -14,32 +14,32 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class MessageBoard extends JTextPane {
 
-    private final transient List<Message> history = new ArrayList<>();
-    
-    private static final Logger LOGGER = LogManager.getLogger(MessageBoard.class);
+	private final transient List<Message> history = new ArrayList<>();
 
-    List<Message> getHistory() {
-        return history;
-    }
+	private static final Logger LOGGER = LogManager.getLogger(MessageBoard.class);
 
-    public void newMessageNotify(Message msg) {
-        history.add(msg);
-        history.sort(Comparator.comparingLong(lhs -> lhs.getTimestamp().getTime()));
-        StringBuilder formattedText = new StringBuilder();
-        for (Message m : history) {
-            if (formattedText.length() > 0) {
-                formattedText.insert(formattedText.length(), System.lineSeparator());
-            }
-            formattedText.append(m.getFormattedMessage());
-        }
-        setText(formattedText.toString());
-    	LOGGER.info("Message added to board");
-    }
+	List<Message> getHistory() {
+		return history;
+	}
 
-    public void clearBoard() {
-        setText("");
-        history.clear();
-    	LOGGER.info("Board cleared");
-    }
+	public void newMessageNotify(Message msg) {
+		history.add(msg);
+		history.sort(Comparator.comparingLong(lhs -> lhs.getTimestamp().getTime()));
+		StringBuilder formattedText = new StringBuilder();
+		for (Message m : history) {
+			if (formattedText.length() > 0) {
+				formattedText.insert(formattedText.length(), System.lineSeparator());
+			}
+			formattedText.append(m.getFormattedMessage());
+		}
+		setText(formattedText.toString());
+		LOGGER.info("Message added to board");
+	}
+
+	public void clearBoard() {
+		setText("");
+		history.clear();
+		LOGGER.info("Board cleared");
+	}
 
 }

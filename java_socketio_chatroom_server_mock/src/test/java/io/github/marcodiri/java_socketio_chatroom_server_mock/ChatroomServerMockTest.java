@@ -49,7 +49,7 @@ public class ChatroomServerMockTest {
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Server cannot be started");
 		}
-		
+
 		assertThat(serverMock.getNamespace().hasListeners("connection")).isTrue();
 	}
 
@@ -62,26 +62,28 @@ public class ChatroomServerMockTest {
 			fail("Server cannot be stopped");
 		}
 	}
-	
+
 	@Test
 	public void testHandleConnections() {
 		String event = "event";
-		Listener listener1 = arg -> {};
-		Listener listener2 = arg -> {};
-		
+		Listener listener1 = arg -> {
+		};
+		Listener listener2 = arg -> {
+		};
+
 		serverMock.getHandlersToAttach().put(event, new ArrayList<>());
 		serverMock.getHandlersToAttach().get(event).add(listener1);
 		serverMock.getHandlersToAttach().get(event).add(listener2);
-		
+
 		clientSocket.connect();
 		try {
 			await().atMost(2, SECONDS).untilAsserted(() -> assertThat(serverMock.getSocket()).isNotNull());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Client could not connect to server");
 		}
-		
+
 		assertThat(serverMock.getSocket().getId()).isEqualTo(clientSocket.id());
-		
+
 		assertThat(serverMock.getSocket().listeners(event)).containsExactly(listener1, listener2);
 		assertThat(serverMock.getHandlersToAttach()).isEmpty();
 	}
@@ -97,17 +99,19 @@ public class ChatroomServerMockTest {
 	@Test
 	public void testHandleEventWhenClientNotConnected() {
 		assertThat(serverMock.getSocket()).isNull();
-		
+
 		String event = "event";
-		Listener listener1 = arg -> {};
-		Listener listener2 = arg -> {};
-		
+		Listener listener1 = arg -> {
+		};
+		Listener listener2 = arg -> {
+		};
+
 		serverMock.handleEvent(event, listener1);
 		serverMock.handleEvent(event, listener2);
-		
+
 		assertThat(serverMock.getHandlersToAttach()).containsKey(event);
 		assertThat(serverMock.getHandlersToAttach().get(event)).containsExactly(listener1, listener2);
-		
+
 	}
 
 	@Test
