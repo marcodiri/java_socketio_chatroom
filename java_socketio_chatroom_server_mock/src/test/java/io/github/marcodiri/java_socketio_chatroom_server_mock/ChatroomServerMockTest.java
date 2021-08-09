@@ -2,12 +2,14 @@ package io.github.marcodiri.java_socketio_chatroom_server_mock;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import io.socket.emitter.Emitter.Listener;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -16,145 +18,149 @@ import static org.awaitility.Awaitility.await;
 
 public class ChatroomServerMockTest {
 
-    private ChatroomServerMock serverMock;
+	private ChatroomServerMock serverMock;
 
-    private Socket clientSocket;
+	private Socket clientSocket;
 
-    @Before
-    public void setup() {
-        serverMock = new ChatroomServerMock();
-        try {
-            serverMock.start();
-        } catch (Exception ignored) {
-            fail("ServerWrapper startup failed");
-        }
+	@Before
+	public void setup() {
+		serverMock = new ChatroomServerMock();
+		try {
+			serverMock.start();
+		} catch (Exception ignored) {
+			fail("ServerWrapper startup failed");
+		}
 
-        clientSocket = IO.socket(URI.create("http://localhost:3000"), IO.Options.builder().build());
-    }
+		clientSocket = IO.socket(URI.create("http://localhost:3000"), IO.Options.builder().build());
+	}
 
-    @After
-    public void closeConnections() throws Exception {
-        clientSocket.disconnect();
-        serverMock.stop();
-    }
+	@After
+	public void closeConnections() throws Exception {
+		clientSocket.disconnect();
+		serverMock.stop();
+	}
 
-    @Test
-    public void testHandleConnections() {
-        assertThat(serverMock.getNamespace().hasListeners("connection")).isTrue();
+	@Test
+	public void testStart() {
+		assertThat(serverMock.getNamespace().hasListeners("connection")).isTrue();
 
-        clientSocket.connect();
-        try {
-            await().atMost(2, SECONDS).until(() -> clientSocket.connected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not connect to server");
-        }
+		try {
+			await().atMost(2, SECONDS).until(() -> serverMock.isStarted());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Server cannot be started");
+		}
+		
+		assertThat(serverMock.getNamespace().hasListeners("connection")).isTrue();
+	}
 
-        assertThat(serverMock.getSocket()).isNotNull();
-        assertThat(serverMock.getSocket().getId()).isEqualTo(clientSocket.id());
-        assertThat(serverMock.getSocket().hasListeners("join")).isTrue();
-        assertThat(serverMock.getSocket().hasListeners("leave")).isTrue();
-    }
+	@Test
+	public void testStop() throws Exception {
+		serverMock.stop();
+		try {
+			await().atMost(2, SECONDS).until(() -> !serverMock.isStarted());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Server cannot be stopped");
+		}
+	}
+	
+	@Test
+	public void testHandleConnections() {
+		String event = "event";
+		Listener listener1 = arg -> {};
+		Listener listener2 = arg -> {};
+		
+		serverMock.getHandlersToAttach().put(event, new ArrayList<>());
+		serverMock.getHandlersToAttach().get(event).add(listener1);
+		serverMock.getHandlersToAttach().get(event).add(listener2);
+		
+		clientSocket.connect();
+		try {
+			await().atMost(2, SECONDS).untilAsserted(() -> assertThat(serverMock.getSocket()).isNotNull());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Client could not connect to server");
+		}
+		
+		assertThat(serverMock.getSocket().getId()).isEqualTo(clientSocket.id());
+		
+		assertThat(serverMock.getSocket().listeners(event)).containsExactly(listener1, listener2);
+		assertThat(serverMock.getHandlersToAttach()).isEmpty();
+	}
 
-    @Test
-    public void testHandleClientJoin() {
-        clientSocket.connect();
-        try {
-            await().atMost(2, SECONDS).until(() -> clientSocket.connected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not connect to server");
-        }
+	@Test
+	public void testHandleNamespaceEvent() {
+		serverMock.handleNamespaceEvent("event", args -> {
+		});
 
-        clientSocket.emit("join");
+		assertThat(serverMock.getNamespace().hasListeners("event")).isTrue();
+	}
 
-        try {
-            await().atMost(2, SECONDS).untilTrue((serverMock.socketIsInRoom()));
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not join the room");
-        }
-    }
+	@Test
+	public void testHandleEventWhenClientNotConnected() {
+		assertThat(serverMock.getSocket()).isNull();
+		
+		String event = "event";
+		Listener listener1 = arg -> {};
+		Listener listener2 = arg -> {};
+		
+		serverMock.handleEvent(event, listener1);
+		serverMock.handleEvent(event, listener2);
+		
+		assertThat(serverMock.getHandlersToAttach()).containsKey(event);
+		assertThat(serverMock.getHandlersToAttach().get(event)).containsExactly(listener1, listener2);
+		
+	}
 
-    @Test
-    public void testHandleClientLeave() {
-        clientSocket.connect();
-        try {
-            await().atMost(2, SECONDS).until(() -> clientSocket.connected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not connect to server");
-        }
+	@Test
+	public void testHandleEventWhenClientConnected() {
+		clientSocket.connect();
+		try {
+			await().atMost(2, SECONDS).until(() -> clientSocket.connected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Client could not connect to server");
+		}
 
-        serverMock.socketIsInRoom().set(true);
-        clientSocket.emit("leave");
+		try {
+			serverMock.handleEvent("event", arg -> {
+			});
+		} catch (NullPointerException e) {
+			fail("Socket is null");
+		}
 
-        try {
-            await().atMost(2, SECONDS).untilFalse((serverMock.socketIsInRoom()));
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not leave the room");
-        }
-    }
+		assertThat(serverMock.getSocket().hasListeners("event")).isTrue();
+	}
 
-    @Test
-    public void testHandleEventWhenClientNotConnected() {
-        assertThat(serverMock.getSocket()).isNull();
+	@Test
+	public void testSendEventWhenClientNotConnected() {
+		assertThat(serverMock.getSocket()).isNull();
 
-        assertThatThrownBy(() -> serverMock.handleEvent("event", arg -> {
-        }))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("socket is null");
-    }
+		assertThatThrownBy(() -> serverMock.sendEvent("event", null)).isInstanceOf(NullPointerException.class)
+				.hasMessage("socket is null");
+	}
 
-    @Test
-    public void testHandleEventWhenClientConnected() {
-        clientSocket.connect();
-        try {
-            await().atMost(2, SECONDS).until(() -> clientSocket.connected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not connect to server");
-        }
+	@Test
+	public void testSendEventWhenClientConnected() {
+		AtomicBoolean eventReceived = new AtomicBoolean(false);
 
-        try {
-            serverMock.handleEvent("event", arg -> {
-            });
-        } catch (NullPointerException e) {
-            fail("Socket is null");
-        }
+		clientSocket.on("event", arg -> eventReceived.set(true));
 
-        assertThat(serverMock.getSocket().hasListeners("event")).isTrue();
-    }
+		clientSocket.connect();
+		try {
+			await().atMost(2, SECONDS).until(() -> clientSocket.connected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Client could not connect to server");
+		}
 
-    @Test
-    public void testSendEventWhenClientNotConnected() {
-        assertThat(serverMock.getSocket()).isNull();
+		try {
+			serverMock.sendEvent("event", new JSONObject());
+		} catch (NullPointerException e) {
+			fail("Socket is null");
+		}
 
-        assertThatThrownBy(() -> serverMock.sendEvent("event", null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("socket is null");
-    }
-
-    @Test
-    public void testSendEventWhenClientConnected() {
-        AtomicBoolean eventReceived = new AtomicBoolean(false);
-
-        clientSocket.on("event", arg -> eventReceived.set(true));
-
-        clientSocket.connect();
-        try {
-            await().atMost(2, SECONDS).until(() -> clientSocket.connected());
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client could not connect to server");
-        }
-
-        try {
-            serverMock.sendEvent("event", new JSONObject());
-        } catch (NullPointerException e) {
-            fail("Socket is null");
-        }
-
-
-        try {
-            await().atMost(2, SECONDS).untilTrue(eventReceived);
-        } catch (org.awaitility.core.ConditionTimeoutException ignored) {
-            fail("Client did not receive the event");
-        }
-    }
+		try {
+			await().atMost(2, SECONDS).untilTrue(eventReceived);
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Client did not receive the event");
+		}
+	}
 
 }

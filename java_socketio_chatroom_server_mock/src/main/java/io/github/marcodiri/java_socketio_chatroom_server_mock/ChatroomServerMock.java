@@ -4,11 +4,13 @@ import io.socket.emitter.Emitter.Listener;
 import io.socket.socketio.server.SocketIoNamespace;
 import io.socket.socketio.server.SocketIoSocket;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatroomServerMock {
 
@@ -17,8 +19,8 @@ public class ChatroomServerMock {
     private final SocketIoNamespace namespace;
 
     private SocketIoSocket socket;
-
-    private final AtomicBoolean socketIsInRoom = new AtomicBoolean(false);
+    
+    private ConcurrentMap<String, List<Listener>> handlersToAttach = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LogManager.getLogger(ChatroomServerMock.class);
 
@@ -39,20 +41,21 @@ public class ChatroomServerMock {
     }
 
     private void handleConnections() {
-        namespace.on("connection", args -> {
-            socket = (SocketIoSocket) args[0];
-            LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
-            handleClientJoin();
-            handleClientLeave();
-        });
+		handleNamespaceEvent("connection", args -> {
+			socket = (SocketIoSocket) args[0];
+			LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
+			for (Map.Entry<String, List<Listener>> event : handlersToAttach.entrySet()) {
+				for (Listener fn : handlersToAttach.get(event.getKey())) {
+					socket.on(event.getKey(), fn);
+				}
+			}
+			handlersToAttach.clear();
+		});
     }
-
-    private void handleClientJoin() throws NullPointerException {
-        handleEvent("join", arg -> socketIsInRoom.set(true));
-    }
-
-    private void handleClientLeave() throws NullPointerException {
-        handleEvent("leave", arg -> socketIsInRoom.set(false));
+    
+    public void handleNamespaceEvent(String event, Listener fn) {
+        namespace.on(event, fn);
+        LOGGER.info("Added listener to server namespace for event: {}", event);
     }
 
     public void handleEvent(String event, Listener fn) throws NullPointerException {
@@ -60,11 +63,15 @@ public class ChatroomServerMock {
             socket.on(event, fn);
             LOGGER.info("Added listener to server for event: {}", event);
         } else {
-            throw new NullPointerException("socket is null");
+        	if (handlersToAttach.containsKey(event)) {
+        		handlersToAttach.get(event).add(fn);
+        	} else {
+        		handlersToAttach.put(event, new ArrayList<>(Collections.singletonList(fn)));
+        	}
         }
     }
 
-    public void sendEvent(String event, JSONObject msg) throws NullPointerException {
+	public void sendEvent(String event, JSONObject msg) throws NullPointerException {
         if (socket != null) {
             socket.send(event, msg);
             LOGGER.info("Sent {event: \"{}\", message: \"{}\"} to Socket {}", event, msg, socket.getId());
@@ -72,6 +79,11 @@ public class ChatroomServerMock {
             throw new NullPointerException("socket is null");
         }
     }
+    
+    public boolean isStarted() {
+    	return serverWrapper.isStarted();
+    }
+
 
     public SocketIoNamespace getNamespace() {
         return namespace;
@@ -81,9 +93,8 @@ public class ChatroomServerMock {
         return socket;
     }
 
-    public AtomicBoolean socketIsInRoom() {
-        return socketIsInRoom;
-    }
-
+    public ConcurrentMap<String, List<Listener>> getHandlersToAttach() {
+		return handlersToAttach;
+	}
 
 }

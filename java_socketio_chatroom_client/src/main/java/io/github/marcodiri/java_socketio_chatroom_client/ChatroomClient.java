@@ -2,6 +2,7 @@ package io.github.marcodiri.java_socketio_chatroom_client;
 
 import java.net.SocketException;
 import java.net.URI;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,15 +16,32 @@ import io.socket.client.Socket;
 
 public class ChatroomClient {
 
-    private final Socket socket;
+    private Socket socket;
 
-    private final ClientView view;
+    ChatroomClientHandlers chatroomClientHandlers;
+    private ClientView view;
 
     private static final Logger LOGGER = LogManager.getLogger(ChatroomClient.class);
 
+    final AtomicBoolean connected = new AtomicBoolean(false);
+
+    String username = null;
+
     public ChatroomClient(URI uri, Options options, ClientView view) {
         this.socket = IO.socket(uri, options);
+        this.chatroomClientHandlers = new ChatroomClientHandlers();
         this.view = view;
+        socket.on("connected", objects -> chatroomClientHandlers.connectedHandler());
+        socket.on(Socket.EVENT_DISCONNECT, objects -> chatroomClientHandlers.disconnectedHandler());
+    }
+
+    ChatroomClient(URI uri, Options options, ChatroomClientHandlers chatroomClientHandlers, ClientView view) {
+        this(uri, options, view);
+        this.chatroomClientHandlers = chatroomClientHandlers;
+    }
+
+    ChatroomClientHandlers getChatroomClientHandlers() {
+        return chatroomClientHandlers;
     }
 
     public Socket getSocket() {
@@ -31,30 +49,19 @@ public class ChatroomClient {
     }
 
     public boolean isConnected() {
-        return socket.connected();
+        return connected.get();
     }
 
     public void connect(String username) {
-        socket.on(Socket.EVENT_CONNECT, objects -> {
-            LOGGER.info("Socket succesfully connected to Server");
-            handleJoin();
-            socket.emit("join", username);
-            LOGGER.info("Socket attempting to join the room");
-            LOGGER.debug(() -> String.format("Sent {event: \"join\", message: \"%s\"} to Server", username));
-            handleMessage();
-            handleError();
-        });
         socket.connect();
         LOGGER.info("Socket attempting to connect to Server");
+        this.username = username;
     }
 
     public void disconnect() {
-        socket.on(Socket.EVENT_DISCONNECT, objects -> {
-            LOGGER.info("Socket succesfully disconnected from Server");
-            socket.off();
-        });
         socket.disconnect();
         LOGGER.info("Socket attempting to disconnect from Server");
+        this.username = null;
     }
 
     public void sendMessage(ClientMessage msg) throws SocketException {
@@ -67,27 +74,47 @@ public class ChatroomClient {
         }
     }
 
-    void handleMessage() {
-        socket.on("msg", arg -> {
+    class ChatroomClientHandlers {
+
+        void connectedHandler() throws NullPointerException{
+            LOGGER.debug(() -> "Received {event: \"connected\"} from Server");
+            if (username != null) {
+                LOGGER.info("Socket succesfully connected to Server");
+                socket.on("joined", arg -> handleJoin(((JSONObject) arg[0]).getString("roomName")));
+                socket.emit("join", username);
+                LOGGER.info("Socket attempting to join the room");
+                LOGGER.debug(() -> String.format("Sent {event: \"join\", message: \"%s\"} to Server", username));
+                socket.on("msg", arg -> handleMessage(new ClientMessage((JSONObject) arg[0])));
+                socket.on("error", arg -> handleError(((JSONObject) arg[0]).getString("message")));
+                connected.set(true);
+            } else {
+                throw new NullPointerException("Username is null");
+            }
+        }
+
+        void disconnectedHandler() {
+            LOGGER.info("Socket succesfully disconnected from Server");
+            socket.off();
+            connected.set(false);
+        }
+
+        void handleMessage(ClientMessage message) {
             LOGGER.info("Message received from Server");
-            LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} from Server", arg[0]));
-            view.addMessage(new ClientMessage((JSONObject) arg[0]));
-        });
-    }
+            LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} from Server", message));
+            view.addMessage(message);
+        }
 
-    void handleJoin() {
-        socket.on("joined", args -> {
+        void handleJoin(String roomName) {
             LOGGER.info("Socket succesfully joined the room");
-            LOGGER.debug(() -> String.format("Received {event: \"joined\", message: \"%s\"} from Server", args[0]));
-            view.roomJoined(((JSONObject) args[0]).getString("roomName"));
-        });
+            LOGGER.debug(() -> String.format("Received {event: \"joined\", message: \"%s\"} from Server", roomName));
+            view.roomJoined(roomName);
+        }
+
+        void handleError(String errorMessage) {
+            LOGGER.info("Error received from Server");
+            LOGGER.debug(() -> String.format("Received {event: \"error\", message: \"%s\"} from Server", errorMessage));
+            view.showError(errorMessage);
+        }
     }
 
-    void handleError() {
-        socket.on("error", args -> {
-            LOGGER.info("Error received from Server");
-            LOGGER.debug(() -> String.format("Received {event: \"error\", message: \"%s\"} from Server", args[0]));
-            view.showError(((JSONObject) args[0]).getString("message"));
-        });
-    }
 }

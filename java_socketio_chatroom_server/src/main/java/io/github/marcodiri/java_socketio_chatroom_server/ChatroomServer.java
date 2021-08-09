@@ -55,6 +55,8 @@ public class ChatroomServer {
             handleClientJoin(socket);
             handleClientMessage(socket, namespace);
             handleClientDisconnect(socket);
+            socket.send("connected");
+            LOGGER.debug(() -> String.format("Sent {event: \"connected\"} to Socket %s", socket.getId()));
         });
     }
 
@@ -101,6 +103,10 @@ public class ChatroomServer {
             usernameList.remove(socket.getId());
             LOGGER.info(String.format("Socket %s removed from room", socket.getId()));
         });
+    }
+
+    public boolean isStarted() {
+        return serverWrapper.isStarted();
     }
 
     SocketIoNamespace getNamespace() {
