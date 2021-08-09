@@ -100,7 +100,6 @@ public class ChatroomServer {
 	private void handleClientDisconnect(SocketIoSocket socket) {
 		socket.on("disconnect", arg -> {
 			LOGGER.debug(() -> String.format("Received {event: \"disconnect\"} from Socket %s", socket.getId()));
-			socket.leaveRoom(CHATROOM_NAME);
 			usernameList.remove(socket.getId());
 			LOGGER.info(String.format("Socket %s removed from room", socket.getId()));
 		});
