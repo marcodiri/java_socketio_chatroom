@@ -88,7 +88,7 @@ public class ChatroomServer {
 			LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} to Socket %s", arg[0], socket.getId()));
 			if (socketIsInRoom(socket)) {
 				namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
-				LOGGER.info("Message broadcasted to clients");
+				LOGGER.info("Message broadcast to clients");
 				JSONObject jsonMsg = (JSONObject) arg[0];
 				Message incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
 				repository.save(incomingMessage);

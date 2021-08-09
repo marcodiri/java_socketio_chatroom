@@ -16,10 +16,10 @@ import io.socket.client.Socket;
 
 public class ChatroomClient {
 
-	private Socket socket;
+	private final Socket socket;
 
 	ChatroomClientHandlers chatroomClientHandlers;
-	private ClientView view;
+	private final ClientView view;
 
 	private static final Logger LOGGER = LogManager.getLogger(ChatroomClient.class);
 
@@ -79,7 +79,7 @@ public class ChatroomClient {
 		void connectedHandler() throws NullPointerException {
 			LOGGER.debug(() -> "Received {event: \"connected\"} from Server");
 			if (username != null) {
-				LOGGER.info("Socket succesfully connected to Server");
+				LOGGER.info("Socket successfully connected to Server");
 				socket.on("joined", arg -> handleJoin(((JSONObject) arg[0]).getString("roomName")));
 				socket.emit("join", username);
 				LOGGER.info("Socket attempting to join the room");
@@ -93,7 +93,7 @@ public class ChatroomClient {
 		}
 
 		void disconnectedHandler() {
-			LOGGER.info("Socket succesfully disconnected from Server");
+			LOGGER.info("Socket successfully disconnected from Server");
 			socket.off();
 			connected.set(false);
 		}
@@ -105,7 +105,7 @@ public class ChatroomClient {
 		}
 
 		void handleJoin(String roomName) {
-			LOGGER.info("Socket succesfully joined the room");
+			LOGGER.info("Socket successfully joined the room");
 			LOGGER.debug(() -> String.format("Received {event: \"joined\", message: \"%s\"} from Server", roomName));
 			view.roomJoined(roomName);
 		}

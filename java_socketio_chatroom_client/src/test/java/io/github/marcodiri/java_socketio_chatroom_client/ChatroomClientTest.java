@@ -10,7 +10,6 @@ import static org.mockito.Mockito.*;
 import java.net.SocketException;
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.socket.client.Socket;
@@ -26,7 +25,6 @@ import io.socket.client.IO;
 public class ChatroomClientTest {
 
 	private ChatroomClient.ChatroomClientHandlers handlers;
-	private ClientView view;
 
 	private ChatroomClient client;
 
@@ -34,7 +32,7 @@ public class ChatroomClientTest {
 
 	@Before
 	public void setup() {
-		view = mock(ClientView.class);
+		ClientView view = mock(ClientView.class);
 		handlers = mock(ChatroomClient.ChatroomClientHandlers.class);
 		client = new ChatroomClient(URI.create("http://localhost:3000"), IO.Options.builder().build(), handlers, view);
 

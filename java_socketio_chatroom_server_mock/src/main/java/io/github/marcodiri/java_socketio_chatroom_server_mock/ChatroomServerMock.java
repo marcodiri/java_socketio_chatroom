@@ -20,7 +20,7 @@ public class ChatroomServerMock {
 
 	private SocketIoSocket socket;
 
-	private ConcurrentMap<String, List<Listener>> handlersToAttach = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, List<Listener>> handlersToAttach = new ConcurrentHashMap<>();
 
 	private static final Logger LOGGER = LogManager.getLogger(ChatroomServerMock.class);
 
