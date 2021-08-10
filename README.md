@@ -56,7 +56,7 @@ The following profiles can be enabled with the `-P` Maven switch:
 * `mutation-testing` to run mutation testing with **PIT**
 
 #### End to End tests
-To run the e2e tests enable the profile `e2e-test`.
+E2E tests are enabled by default. If you wish to skip it, set the variable `-DskipE2E` in the Maven command.
 
 ### IDE
 For IT and E2E tests you'll need to have a running instance of MongoDB, either on your PC on port **27017** or in a Docker container with the command:
