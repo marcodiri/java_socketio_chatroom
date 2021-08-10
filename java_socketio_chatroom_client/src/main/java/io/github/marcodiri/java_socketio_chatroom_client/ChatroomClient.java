@@ -61,7 +61,6 @@ public class ChatroomClient {
 	public void disconnect() {
 		socket.disconnect();
 		LOGGER.info("Socket attempting to disconnect from Server");
-		this.username = null;
 	}
 
 	public void sendMessage(ClientMessage msg) throws SocketException {
@@ -96,6 +95,7 @@ public class ChatroomClient {
 			LOGGER.info("Socket successfully disconnected from Server");
 			socket.off();
 			connected.set(false);
+			username = null;
 		}
 
 		void handleMessage(ClientMessage message) {
