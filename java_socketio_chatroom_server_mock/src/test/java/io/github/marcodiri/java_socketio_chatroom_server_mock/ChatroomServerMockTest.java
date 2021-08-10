@@ -41,20 +41,21 @@ public class ChatroomServerMockTest {
 	}
 
 	@Test
-	public void testStart() {
-		assertThat(serverMock.getNamespace().hasListeners("connection")).isTrue();
-
+	public void testStartStartsTheServer() {
 		try {
 			await().atMost(2, SECONDS).until(() -> serverMock.isStarted());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Server cannot be started");
 		}
+	}
 
+	@Test
+	public void testStartAttachesConnectionListenerToNamespace() {
 		assertThat(serverMock.getNamespace().hasListeners("connection")).isTrue();
 	}
 
 	@Test
-	public void testStop() throws Exception {
+	public void testStopStopsTheServer() throws Exception {
 		serverMock.stop();
 		try {
 			await().atMost(2, SECONDS).until(() -> !serverMock.isStarted());
@@ -64,7 +65,15 @@ public class ChatroomServerMockTest {
 	}
 
 	@Test
-	public void testHandleConnections() {
+	public void testHandleConnectionsSavesTheConnectedClientSocket() {
+		clientSocket.connect();
+		waitClientConnected();
+
+		assertThat(serverMock.getSocket().getId()).isEqualTo(clientSocket.id());
+	}
+
+	@Test
+	public void testHandleConnectionsAttachesSavedListenersToClientOnConnectAndClearsTheList() {
 		String event = "event";
 		Listener listener1 = arg -> {
 		};
@@ -76,13 +85,7 @@ public class ChatroomServerMockTest {
 		serverMock.getHandlersToAttach().get(event).add(listener2);
 
 		clientSocket.connect();
-		try {
-			await().atMost(2, SECONDS).untilAsserted(() -> assertThat(serverMock.getSocket()).isNotNull());
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Client could not connect to server");
-		}
-
-		assertThat(serverMock.getSocket().getId()).isEqualTo(clientSocket.id());
+		waitClientConnected();
 
 		assertThat(serverMock.getSocket().listeners(event)).containsExactly(listener1, listener2);
 		assertThat(serverMock.getHandlersToAttach()).isEmpty();
@@ -117,14 +120,10 @@ public class ChatroomServerMockTest {
 	@Test
 	public void testHandleEventWhenClientConnected() {
 		clientSocket.connect();
-		try {
-			await().atMost(2, SECONDS).until(() -> clientSocket.connected());
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Client could not connect to server");
-		}
+		waitClientConnected();
 
 		try {
-			serverMock.handleEvent("event", arg -> {
+			serverMock.handleEvent("event", args -> {
 			});
 		} catch (NullPointerException e) {
 			fail("Socket is null");
@@ -145,14 +144,10 @@ public class ChatroomServerMockTest {
 	public void testSendEventWhenClientConnected() {
 		AtomicBoolean eventReceived = new AtomicBoolean(false);
 
-		clientSocket.on("event", arg -> eventReceived.set(true));
+		clientSocket.on("event", args -> eventReceived.set(true));
 
 		clientSocket.connect();
-		try {
-			await().atMost(2, SECONDS).until(() -> clientSocket.connected());
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Client could not connect to server");
-		}
+		waitClientConnected();
 
 		try {
 			serverMock.sendEvent("event", new JSONObject());
@@ -164,6 +159,14 @@ public class ChatroomServerMockTest {
 			await().atMost(2, SECONDS).untilTrue(eventReceived);
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Client did not receive the event");
+		}
+	}
+
+	private void waitClientConnected() {
+		try {
+			await().atMost(2, SECONDS).until(() -> clientSocket.connected());
+		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
+			fail("Client could not connect to server");
 		}
 	}
 
