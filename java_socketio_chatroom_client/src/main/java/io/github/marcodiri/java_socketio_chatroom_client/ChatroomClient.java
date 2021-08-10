@@ -53,9 +53,9 @@ public class ChatroomClient {
 	}
 
 	public void connect(String username) {
+		this.username = username;
 		socket.connect();
 		LOGGER.info("Socket attempting to connect to Server");
-		this.username = username;
 	}
 
 	public void disconnect() {
