@@ -269,7 +269,7 @@ public class ChatroomServerTest {
 	}
 
 	@Test
-	public void testRoomSizeWhenClientJoinsAndWhenDisconnects() {
+	public void testRoomSizeWhenClientJoins() {
 		clientSocket.on("connected", args -> clientSocket.emit("join", "user"));
 		clientSocket.connect();
 
@@ -277,12 +277,6 @@ public class ChatroomServerTest {
 			await().atMost(2, SECONDS).until(() -> chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length == 1);
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Expected 1 but got " + chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length);
-		}
-		clientSocket.disconnect();
-		try {
-			await().atMost(2, SECONDS).until(() -> chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length == 0);
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Expected 0 but got " + chatroomServer.getNamespace().getAdapter().listClients("Chatroom").length);
 		}
 	}
 

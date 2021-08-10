@@ -63,6 +63,7 @@ public class ChatroomServer {
 	private void handleClientJoin(SocketIoSocket socket) {
 		socket.on("join", arg -> {
 			LOGGER.info(String.format("Socket %s is trying to join the room", socket.getId()));
+			LOGGER.debug(() -> String.format("Received {event: \"join\", message: \"%s\"} from Socket %s", arg[0], socket.getId()));
 			if (!socketIsInRoom(socket)) {
 				if (usernameList.containsValue(arg[0].toString())) {
 					sendError(socket, "Username is already taken");
@@ -85,7 +86,7 @@ public class ChatroomServer {
 	private void handleClientMessage(SocketIoSocket socket, SocketIoNamespace namespace) {
 		socket.on("msg", arg -> {
 			LOGGER.info(String.format("Message received from Socket %s", socket.getId()));
-			LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} to Socket %s", arg[0], socket.getId()));
+			LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} from Socket %s", arg[0], socket.getId()));
 			if (socketIsInRoom(socket)) {
 				namespace.broadcast(CHATROOM_NAME, "msg", arg[0]);
 				LOGGER.info("Message broadcast to clients");
@@ -99,7 +100,6 @@ public class ChatroomServer {
 	private void handleClientDisconnect(SocketIoSocket socket) {
 		socket.on("disconnect", arg -> {
 			LOGGER.debug(() -> String.format("Received {event: \"disconnect\"} from Socket %s", socket.getId()));
-			socket.leaveRoom(CHATROOM_NAME);
 			usernameList.remove(socket.getId());
 			LOGGER.info(String.format("Socket %s removed from room", socket.getId()));
 		});

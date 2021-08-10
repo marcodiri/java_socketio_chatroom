@@ -82,4 +82,4 @@ java -jar ./target/*-jar-with-dependencies.jar
 
 ## Known issues
 It seems that sometimes the socket.io library is not able to send or receive the events correctly, resulting in tests failure or undefined behaviours by the **Client** application.
-We reported the [issue](https://#) to the library maintainers.
+We reported the [issue](https://github.com/trinopoty/socket.io-server-java/issues/17) to the library maintainers.
