@@ -29,6 +29,8 @@ public class ChatroomClientTest {
 	private ChatroomClient client;
 
 	private ChatroomServerMock serverMock;
+	
+	private final String USERNAME = "user";
 
 	@Before
 	public void setup() {
@@ -46,7 +48,7 @@ public class ChatroomClientTest {
 
 	@After
 	public void closeConnections() {
-		client.disconnect();
+		client.getSocket().disconnect();
 		try {
 			serverMock.stop();
 		} catch (Exception e) {
@@ -55,10 +57,13 @@ public class ChatroomClientTest {
 	}
 
 	@Test
-	public void testInit() {
+	public void testInitAttachesListenersToSocket() {
 		assertThat(client.getSocket().hasListeners("connected")).isTrue();
 		assertThat(client.getSocket().hasListeners(Socket.EVENT_DISCONNECT)).isTrue();
+	}
 
+	@Test
+	public void testInitListenerCallsConnectedHandlerOnConnectedEvent() {
 		serverMock.handleNamespaceEvent("connection", arg -> serverMock.getSocket().send("connected"));
 
 		client.getSocket().connect();
@@ -68,6 +73,14 @@ public class ChatroomClientTest {
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("connectedHandler not called");
 		}
+		
+		verifyNoMoreInteractions(handlers);
+	}
+
+	@Test
+	public void testInitListenerCallsDisconnectedHandlerOnDisconnectEvent() {
+		client.getSocket().connect();
+		waitClientConnected();
 
 		client.getSocket().disconnect();
 
@@ -76,32 +89,27 @@ public class ChatroomClientTest {
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("disconnectedHandler not called");
 		}
-
+		
+		verifyNoMoreInteractions(handlers);
 	}
 
 	@Test
-	public void testConnect() {
-		String username = "user";
-
-		client.connect(username);
-
-		try {
-			await().atMost(2, SECONDS).until(() -> client.getSocket().connected());
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Client cannot connect to server");
-		}
-
-		assertThat(client.username).isEqualTo(username);
+	public void testConnectConnectsTheClientToServer() {
+		client.connect(USERNAME);
+		waitClientConnected();
 	}
 
 	@Test
-	public void testDisconnect() {
+	public void testConnectSetsUsername() {
+		client.connect(USERNAME);
+		
+		assertThat(client.username).isEqualTo(USERNAME);
+	}
+
+	@Test
+	public void testDisconnectDisconnectsTheClientFromServer() {
 		client.getSocket().connect();
-		try {
-			await().atMost(2, SECONDS).until(() -> client.getSocket().connected());
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Cannot connect to server");
-		}
+		waitClientConnected();
 
 		client.disconnect();
 		try {
@@ -109,13 +117,11 @@ public class ChatroomClientTest {
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Cannot disconnect from server");
 		}
-
-		assertThat(client.username).isNull();
 	}
 
 	@Test
 	public void testSendMessageWhenClientNotConnected() {
-		ClientMessage msg = new ClientMessage(new Timestamp(0), "user", "message");
+		ClientMessage msg = new ClientMessage(new Timestamp(0), USERNAME, "message");
 
 		assertThatThrownBy(() -> client.sendMessage(msg)).isInstanceOf(SocketException.class)
 				.hasMessage("Unable to send message when not connected to server");
@@ -129,15 +135,10 @@ public class ChatroomClientTest {
 		serverMock.handleEvent("msg", arg -> receivedMsg.set((JSONObject) arg[0]));
 
 		client.getSocket().connect();
-		try {
-			await().atMost(2, SECONDS).until(() -> client.getSocket().connected());
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Client could not connect to server");
-		}
-
+		waitClientConnected();
 		client.connected.set(true);
 
-		ClientMessage msg = new ClientMessage(new Timestamp(0), "user", "message");
+		ClientMessage msg = new ClientMessage(new Timestamp(0), USERNAME, "message");
 		try {
 			client.sendMessage(msg);
 		} catch (SocketException e) {
@@ -147,8 +148,16 @@ public class ChatroomClientTest {
 		try {
 			await().atMost(2, SECONDS).untilAsserted(() -> assertThat(receivedMsg.get()).isNotNull());
 			await().atMost(2, SECONDS).until(() -> msg.equals(new ClientMessage(receivedMsg.get())));
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail(e.getMessage());
+		}
+	}
+
+	private void waitClientConnected() {
+		try {
+			await().atMost(2, SECONDS).until(() -> client.getSocket().connected());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Server did not receive the correct message");
+			fail("Cannot connect to server");
 		}
 	}
 

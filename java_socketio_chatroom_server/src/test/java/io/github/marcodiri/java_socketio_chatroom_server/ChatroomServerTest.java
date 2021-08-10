@@ -18,6 +18,7 @@ import java.net.URI;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -60,31 +61,36 @@ public class ChatroomServerTest {
 	}
 
 	@Test
-	public void testStart() {
-		assertThat(chatroomServer.getNamespace().hasListeners("connection")).isTrue();
+	public void testStartStartsTheServer() {
 		try {
 			await().atMost(2, SECONDS).until(() -> chatroomServer.isStarted());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Cannot start the server");
 		}
+	}
 
-		AtomicBoolean clientIsConnected = new AtomicBoolean(false);
+	@Test
+	public void testStartAttachesConnectionListenerToNamespace() {
+		assertThat(chatroomServer.getNamespace().hasListeners("connection")).isTrue();
+	}
 
-		clientSocket.on("connected", args -> clientIsConnected.set(true));
+	@Test
+	public void testStartSendsConnectedEventToConnectedClients() {
+		AtomicBoolean connectedReceived = new AtomicBoolean(false);
+
+		clientSocket.on("connected", args -> connectedReceived.set(true));
 		clientSocket.connect();
 
 		try {
-			await().atMost(2, SECONDS).untilTrue(clientIsConnected);
+			await().atMost(5, SECONDS).untilTrue(connectedReceived);
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Client did not receive \"connected\" event");
 		}
 	}
 
 	@Test
-	public void testStop() throws Exception {
-		chatroomServer.getUsernameList().put("Id", "user1");
+	public void testStopStopsTheServer() throws Exception {
 		chatroomServer.stop();
-		assertThat(chatroomServer.getUsernameList()).isEmpty();
 		try {
 			await().atMost(2, SECONDS).until(() -> !chatroomServer.isStarted());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
@@ -93,7 +99,14 @@ public class ChatroomServerTest {
 	}
 
 	@Test
-	public void testClientJoinWithFreeUsernameAddsUsernameToListAndRetrievesMessagesFromDb() {
+	public void testStopStopsClearsTheUsernameList() throws Exception {
+		chatroomServer.getUsernameList().put("Id", "user1");
+		chatroomServer.stop();
+		assertThat(chatroomServer.getUsernameList()).isEmpty();
+	}
+
+	@Test
+	public void testServerRetrievesMessagesFromDbWhenClientJoinsWithFreeUsername() {
 		List<Message> history = new ArrayList<>();
 		ServerMessage msg1 = new ServerMessage(new Timestamp(0), "user1", "message1");
 		ServerMessage msg2 = new ServerMessage(new Timestamp(1), "user2", "message2");
@@ -102,12 +115,12 @@ public class ChatroomServerTest {
 		when(serverRepository.findAll()).thenReturn(history);
 
 		List<ServerMessage> retrievedMessages = new ArrayList<>();
-		clientSocket.on("msg", arg -> {
-			JSONObject jsonMsg = (JSONObject) arg[0];
+		clientSocket.on("msg", args -> {
+			JSONObject jsonMsg = (JSONObject) args[0];
 			ServerMessage incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
 			retrievedMessages.add(incomingMessage);
 		});
-		clientSocket.on("connected", objects -> clientSocket.emit("join", "user"));
+		clientSocket.on("connected", args -> clientSocket.emit("join", "user"));
 		clientSocket.connect();
 
 		try {
@@ -116,7 +129,22 @@ public class ChatroomServerTest {
 			fail("Expected " + asList(msg1, msg2) + " but got " + retrievedMessages);
 		}
 		verify(serverRepository, times(1)).findAll();
-		assertThat(chatroomServer.getUsernameList()).containsExactly(entry(clientSocket.id(), "user"));
+	}
+
+	@Test
+	public void testServerAddsUsernameToListWhenClientJoinsWithFreeUsername() {
+		clientSocket.on("connected", args -> clientSocket.emit("join", "user"));
+		clientSocket.connect();
+
+		AtomicReference<Map<String, String>> usernameList = new AtomicReference<>();
+		try {
+			await().atMost(2, SECONDS).untilAsserted(() -> {
+				usernameList.set(chatroomServer.getUsernameList());
+				assertThat(usernameList.get()).containsExactly(entry(clientSocket.id(), "user"));
+			});
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
@@ -128,13 +156,15 @@ public class ChatroomServerTest {
 			fail("Client cannot connect to server");
 		}
 
-		chatroomServer.getUsernameList().put(clientSocket.id(), "user");
+		chatroomServer.getUsernameList().put(clientSocket.id(), "user1");
+		chatroomServer.getUsernameList().put("123", "user2");
 
 		clientSocket.disconnect();
 		try {
-			await().atMost(2, SECONDS).untilAsserted(() -> assertThat(chatroomServer.getUsernameList()).isEmpty());
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Username not removed from the list");
+			await().atMost(2, SECONDS).untilAsserted(() ->
+					assertThat(chatroomServer.getUsernameList().keySet()).doesNotContain(clientSocket.id()));
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail(e.getMessage());
 		}
 	}
 
@@ -144,17 +174,17 @@ public class ChatroomServerTest {
 
 		AtomicReference<String> errorMessage = new AtomicReference<>();
 
-		clientSocket.on("error", arg -> {
-			JSONObject jsonMsg = (JSONObject) arg[0];
+		clientSocket.on("error", args -> {
+			JSONObject jsonMsg = (JSONObject) args[0];
 			errorMessage.set(jsonMsg.getString("message"));
 		});
-		clientSocket.on("connected", objects -> clientSocket.emit("join", "user1"));
+		clientSocket.on("connected", args -> clientSocket.emit("join", "user1"));
 		clientSocket.connect();
 
 		try {
 			await().atMost(2, SECONDS).untilAsserted(() -> assertThat(errorMessage.get()).isEqualTo("Username is already taken"));
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Expected: [Username is already taken] but got [" + errorMessage.get() + "]");
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail(e.getMessage());
 		}
 	}
 
@@ -167,13 +197,13 @@ public class ChatroomServerTest {
 			chatRoomNameReceived.set(((JSONObject) args[0]).getString("roomName"));
 			joinedReceived.set(true);
 		});
-		clientSocket.on("connected", objects -> clientSocket.emit("join", "user"));
+		clientSocket.on("connected", args -> clientSocket.emit("join", "user"));
 		clientSocket.connect();
 
 		try {
 			await().atMost(2, SECONDS).untilTrue(joinedReceived);
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Expected true but got " + joinedReceived.get());
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail(e.getMessage());
 		}
 
 		assertThat(chatRoomNameReceived.get()).isEqualTo("Chatroom");
@@ -187,12 +217,12 @@ public class ChatroomServerTest {
 		when(serverRepository.findAll()).thenReturn(new ArrayList<>());
 
 		List<ServerMessage> retrievedMessages = new ArrayList<>();
-		clientSocket.on("msg", arg -> {
-			JSONObject jsonMsg = (JSONObject) arg[0];
+		clientSocket.on("msg", args -> {
+			JSONObject jsonMsg = (JSONObject) args[0];
 			ServerMessage incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
 			retrievedMessages.add(incomingMessage);
 		});
-		clientSocket.on("connected", objects -> {
+		clientSocket.on("connected", args -> {
 			clientSocket.emit("join", "user");
 			clientSocket.emit("msg", originalMessage1.toJSON());
 			clientSocket.emit("msg", originalMessage2.toJSON());
@@ -214,12 +244,12 @@ public class ChatroomServerTest {
 		when(serverRepository.findAll()).thenReturn(new ArrayList<>());
 
 		List<ServerMessage> retrievedMessages = new ArrayList<>();
-		clientSocket.on("msg", arg -> {
-			JSONObject jsonMsg = (JSONObject) arg[0];
+		clientSocket.on("msg", args -> {
+			JSONObject jsonMsg = (JSONObject) args[0];
 			ServerMessage incomingMessage = new ServerMessage(new Timestamp(jsonMsg.getLong("timestamp")), jsonMsg.getString("user"), jsonMsg.getString("message"));
 			retrievedMessages.add(incomingMessage);
 		});
-		clientSocket.on("connected", objects -> {
+		clientSocket.on("connected", args -> {
 			clientSocket.emit("join", "user");
 			clientSocket.emit("msg", originalMessage1.toJSON());
 			clientSocket.emit("msg", originalMessage2.toJSON());
@@ -240,7 +270,7 @@ public class ChatroomServerTest {
 
 	@Test
 	public void testRoomSizeWhenClientJoins() {
-		clientSocket.on("connected", objects -> clientSocket.emit("join", "user"));
+		clientSocket.on("connected", args -> clientSocket.emit("join", "user"));
 		clientSocket.connect();
 
 		try {
@@ -254,7 +284,7 @@ public class ChatroomServerTest {
 	public void testServerIgnoresJoinFromAnInRoomClient() {
 		when(serverRepository.findAll()).thenReturn(new ArrayList<>());
 
-		clientSocket.on("connected", objects -> {
+		clientSocket.on("connected", args -> {
 			clientSocket.emit("join", "user1");
 
 			clientSocket.emit("join", "user2");
@@ -275,21 +305,47 @@ public class ChatroomServerTest {
 	}
 
 	@Test
-	public void testServerIgnoresMessagesFromANonInRoomClient() {
+	public void testServerDoesNotBroadcastMessagesFromANotInRoomClient() {
 		AtomicBoolean msgReceived = new AtomicBoolean(false);
 
-		clientSocket.on("connected", objects -> {
+		Socket clientSocket2 = IO.socket(URI.create("http://localhost:3000"), IO.Options.builder().build());
+		clientSocket2.on("connected", args -> clientSocket2.emit("join", "user1"));
+		clientSocket2.on("msg", args -> msgReceived.set(true));
+		clientSocket2.connect();
+
+		try {
+			await().atMost(2, SECONDS).until(clientSocket2::connected);
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail("Cannot connect to server");
+		}
+
+		clientSocket.on("connected", args -> {
 			Message msg = new ServerMessage(new Timestamp(0), "user", "message");
 			clientSocket.emit("msg", msg.toJSON());
 		});
-		clientSocket.on("msg", arg -> msgReceived.set(true));
 		clientSocket.connect();
 
 		try {
 			await().during(2, SECONDS).atMost(3, SECONDS).untilFalse(msgReceived);
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Expected no msg received but got instead");
+			fail("An in room Client received a message from an out of room Client");
 		}
-		verifyNoInteractions(serverRepository);
 	}
+
+	@Test
+	public void testServerDoesNotSaveMessagesFromANotInRoomClient() {
+		clientSocket.on("connected", args -> {
+			Message msg = new ServerMessage(new Timestamp(0), "user", "message");
+			clientSocket.emit("msg", msg.toJSON());
+		});
+		clientSocket.connect();
+
+		try {
+			await().during(2, SECONDS).atMost(3, SECONDS).untilAsserted(() ->
+					verifyNoInteractions(serverRepository));
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail(e.getMessage());
+		}
+	}
+
 }
