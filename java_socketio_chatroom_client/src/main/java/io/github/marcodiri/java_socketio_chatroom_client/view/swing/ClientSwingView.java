@@ -234,8 +234,10 @@ public class ClientSwingView extends JFrame implements ClientView {
 	public void showError(String errorMsg) {
 		SwingUtilities.invokeLater(() -> {
 			txtErrorMessage.setText(errorMsg);
-			snapshot.restore();
-			LOGGER.debug(() -> "Restored previous View state");
+			if (snapshot != null) {
+				snapshot.restore();
+				LOGGER.debug(() -> "Restored previous View state");
+			}
 		});
 	}
 
@@ -245,8 +247,7 @@ public class ClientSwingView extends JFrame implements ClientView {
 
 	private void sendMessage() {
 		txtErrorMessage.setText("");
-		snapshot.save(() -> {
-		});
+		snapshot = null;
 		ClientMessage msg = new ClientMessage(
 				new Timestamp(System.currentTimeMillis()),
 				txtUsername.getText(),
