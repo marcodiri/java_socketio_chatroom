@@ -53,7 +53,7 @@ public class ChatroomServer {
 			final SocketIoSocket socket = (SocketIoSocket) args[0];
 			LOGGER.info(String.format("New incoming connection from %s", socket.getId()));
 			handleClientJoin(socket);
-			handleClientMessage(socket, namespace);
+			handleClientMessage(socket);
 			handleClientDisconnect(socket);
 			socket.send("connected");
 			LOGGER.debug(() -> String.format("Sent {event: \"connected\"} to Socket %s", socket.getId()));
@@ -83,7 +83,7 @@ public class ChatroomServer {
 		});
 	}
 
-	private void handleClientMessage(SocketIoSocket socket, SocketIoNamespace namespace) {
+	private void handleClientMessage(SocketIoSocket socket) {
 		socket.on("msg", arg -> {
 			LOGGER.info(String.format("Message received from Socket %s", socket.getId()));
 			LOGGER.debug(() -> String.format("Received {event: \"msg\", message: \"%s\"} from Socket %s", arg[0], socket.getId()));
