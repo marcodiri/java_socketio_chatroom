@@ -18,7 +18,7 @@ public class ChatroomClient {
 
 	private final Socket socket;
 
-	ChatroomClientHandlers chatroomClientHandlers;
+	private ChatroomClientHandlers chatroomClientHandlers;
 	private final ClientView view;
 
 	private static final Logger LOGGER = LogManager.getLogger(ChatroomClient.class);
