@@ -65,7 +65,6 @@ public class ClientSwingViewIT extends AssertJSwingJUnitTestCase {
 
 	@Override
 	public void onTearDown() throws Exception {
-		client.disconnect();
 		server.stop();
 		closeable.close();
 	}
