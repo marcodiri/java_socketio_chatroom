@@ -1,81 +1,81 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<groupId>io.github.marcodiri</groupId>
-	<artifactId>java_socketio_chatroom_aggregator</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>pom</packaging>
+  <groupId>io.github.marcodiri</groupId>
+  <artifactId>java_socketio_chatroom_aggregator</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-	<name>java_socketio_chatroom_aggregator</name>
+  <name>java_socketio_chatroom_aggregator</name>
 
-	<modules>
-		<module>../java_socketio_chatroom_parent</module>
-		<module>../java_socketio_chatroom_core</module>
-		<module>../java_socketio_chatroom_server</module>
-		<module>../java_socketio_chatroom_server_mock</module>
-		<module>../java_socketio_chatroom_client</module>
-	</modules>
+  <modules>
+    <module>../java_socketio_chatroom_parent</module>
+    <module>../java_socketio_chatroom_core</module>
+    <module>../java_socketio_chatroom_server</module>
+    <module>../java_socketio_chatroom_server_mock</module>
+    <module>../java_socketio_chatroom_client</module>
+  </modules>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<!-- For each rule to be ignored, add another eXX and two corresponding
-			properties with eXX in the name as below -->
-		<sonar.issue.ignore.multicriteria>e11,e12,e13,e14</sonar.issue.ignore.multicriteria>
-		<!-- Disable rule for "Field names should comply with a naming convention" -->
-		<sonar.issue.ignore.multicriteria.e11.ruleKey>
-			java:S116
-		</sonar.issue.ignore.multicriteria.e11.ruleKey>
-		<sonar.issue.ignore.multicriteria.e11.resourceKey>
-			**/ClientSwingView.java
-		</sonar.issue.ignore.multicriteria.e11.resourceKey>
-		<!-- Disable rule for "Local variable and method parameter names should
-			comply with a naming convention" -->
-		<sonar.issue.ignore.multicriteria.e12.ruleKey>
-			java:S117
-		</sonar.issue.ignore.multicriteria.e12.ruleKey>
-		<sonar.issue.ignore.multicriteria.e12.resourceKey>
-			**/ClientSwingView.java
-		</sonar.issue.ignore.multicriteria.e12.resourceKey>
-		<!-- Disable rule for "Tests should include assertions": SonarQube is not
-			aware of AssertJ Swing -->
-		<sonar.issue.ignore.multicriteria.e13.ruleKey>
-			java:S2699
-		</sonar.issue.ignore.multicriteria.e13.ruleKey>
-		<sonar.issue.ignore.multicriteria.e13.resourceKey>
-			**/ClientSwingViewTest.java
-		</sonar.issue.ignore.multicriteria.e13.resourceKey>
-		<!-- Disable rule for "Test classes should comply with a naming convention"
-			for E2E tests -->
-		<sonar.issue.ignore.multicriteria.e14.ruleKey>
-			java:S3577
-		</sonar.issue.ignore.multicriteria.e14.ruleKey>
-		<sonar.issue.ignore.multicriteria.e14.resourceKey>
-			**/*E2E.java
-		</sonar.issue.ignore.multicriteria.e14.resourceKey>
-	</properties>
+    <!-- For each rule to be ignored, add another eXX and two corresponding
+      properties with eXX in the name as below -->
+    <sonar.issue.ignore.multicriteria>e11,e12,e13,e14</sonar.issue.ignore.multicriteria>
+    <!-- Disable rule for "Field names should comply with a naming convention" -->
+    <sonar.issue.ignore.multicriteria.e11.ruleKey>
+      java:S116
+    </sonar.issue.ignore.multicriteria.e11.ruleKey>
+    <sonar.issue.ignore.multicriteria.e11.resourceKey>
+      **/ClientSwingView.java
+    </sonar.issue.ignore.multicriteria.e11.resourceKey>
+    <!-- Disable rule for "Local variable and method parameter names should
+      comply with a naming convention" -->
+    <sonar.issue.ignore.multicriteria.e12.ruleKey>
+      java:S117
+    </sonar.issue.ignore.multicriteria.e12.ruleKey>
+    <sonar.issue.ignore.multicriteria.e12.resourceKey>
+      **/ClientSwingView.java
+    </sonar.issue.ignore.multicriteria.e12.resourceKey>
+    <!-- Disable rule for "Tests should include assertions": SonarQube is not
+      aware of AssertJ Swing -->
+    <sonar.issue.ignore.multicriteria.e13.ruleKey>
+      java:S2699
+    </sonar.issue.ignore.multicriteria.e13.ruleKey>
+    <sonar.issue.ignore.multicriteria.e13.resourceKey>
+      **/ClientSwingViewTest.java
+    </sonar.issue.ignore.multicriteria.e13.resourceKey>
+    <!-- Disable rule for "Test classes should comply with a naming convention"
+      for E2E tests -->
+    <sonar.issue.ignore.multicriteria.e14.ruleKey>
+      java:S3577
+    </sonar.issue.ignore.multicriteria.e14.ruleKey>
+    <sonar.issue.ignore.multicriteria.e14.resourceKey>
+      **/*E2E.java
+    </sonar.issue.ignore.multicriteria.e14.resourceKey>
+  </properties>
 
-	<profiles>
-		<profile>
-			<id>jacoco</id>
-			<modules>
-				<module>../java_socketio_chatroom_report</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>e2e-tests</id>
-			<activation>
-				<property>
-					<name>skipE2E</name>
-					<value>!true</value>
-				</property>
-			</activation>
-			<modules>
-				<module>../java_socketio_chatroom_e2e</module>
-			</modules>
-		</profile>
-	</profiles>
+  <profiles>
+    <profile>
+      <id>jacoco</id>
+      <modules>
+        <module>../java_socketio_chatroom_report</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>e2e-tests</id>
+      <activation>
+        <property>
+          <name>skipE2E</name>
+          <value>!true</value>
+        </property>
+      </activation>
+      <modules>
+        <module>../java_socketio_chatroom_e2e</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

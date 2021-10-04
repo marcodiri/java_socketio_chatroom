@@ -1,67 +1,67 @@
 <?xml version="1.0"?>
 <project
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
-		xmlns="http://maven.apache.org/POM/4.0.0"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>io.github.marcodiri</groupId>
-		<artifactId>java_socketio_chatroom_parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../java_socketio_chatroom_parent</relativePath>
-	</parent>
+  <parent>
+    <groupId>io.github.marcodiri</groupId>
+    <artifactId>java_socketio_chatroom_parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../java_socketio_chatroom_parent</relativePath>
+  </parent>
 
-	<artifactId>java_socketio_chatroom_core</artifactId>
-	<packaging>jar</packaging>
+  <artifactId>java_socketio_chatroom_core</artifactId>
+  <packaging>jar</packaging>
 
-	<name>java_socketio_chatroom_core</name>
+  <name>java_socketio_chatroom_core</name>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<sonar.coverage.exclusions>
-			**/model/*.*
-		</sonar.coverage.exclusions>
-	</properties>
+    <sonar.coverage.exclusions>
+      **/model/*.*
+    </sonar.coverage.exclusions>
+  </properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
-	<profiles>
-		<profile>
-			<id>jacoco</id>
-			<activation>
-				<!-- Activated when the system property "skipCoverage" is not defined
-					at all or is defined with a value which is not "true", thus, implicitly active
-					by default -->
-				<property>
-					<name>skipCoverage</name>
-					<value>!true</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<!-- configured in pluginManagement -->
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<configuration>
-							<excludes>
-								<exclude>**/model/*.*</exclude>
-							</excludes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+  <profiles>
+    <profile>
+      <id>jacoco</id>
+      <activation>
+        <!-- Activated when the system property "skipCoverage" is not defined
+          at all or is defined with a value which is not "true", thus, implicitly active
+          by default -->
+        <property>
+          <name>skipCoverage</name>
+          <value>!true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- configured in pluginManagement -->
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/model/*.*</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
