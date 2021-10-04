@@ -90,8 +90,8 @@ public class ClientSwingViewIT extends AssertJSwingJUnitTestCase {
 		JTextComponentFixture messageBoard = window.textBox("msgsTextPane");
 		try {
 			await().atMost(2, SECONDS).untilAsserted(() -> assertThat(messageBoard.text()).isEqualTo(expectedText));
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Expected: " + expectedText + " but got: " + messageBoard.text());
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail(e.getMessage());
 		}
 	}
 
@@ -131,8 +131,8 @@ public class ClientSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		try {
 			await().atMost(2, SECONDS).untilAsserted(() -> txtErrorMessage.requireText("Username is already taken"));
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Expected [Username is already taken] but got [" + txtErrorMessage.text() + "]");
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail(e.getMessage());
 		}
 	}
 
