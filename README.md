@@ -77,8 +77,9 @@ java -jar ./target/*-jar-with-dependencies.jar
 ### Client
 ```console
 cd java_socketio_chatroom_client
-java -jar ./target/*-jar-with-dependencies.jar
+java -jar ./target/*-jar-with-dependencies.jar hostname
 ```
+The hostname or IP address of the **Server** must be indicated in the *hostname* parameter.
 
 ## Known issues
 It seems that sometimes the socket.io library is not able to send or receive the events correctly, resulting in tests failure or undefined behaviours by the **Client** application.
