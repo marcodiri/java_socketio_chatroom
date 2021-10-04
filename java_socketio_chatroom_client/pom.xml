@@ -121,10 +121,6 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
-			<plugin>
-				<groupId>io.fabric8</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</build>
 
