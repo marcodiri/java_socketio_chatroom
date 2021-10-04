@@ -1,14 +1,11 @@
 package io.github.marcodiri.java_socketio_chatroom_client.view.swing;
 
-import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
 import io.github.marcodiri.java_socketio_chatroom_client.ChatroomClient;
 import io.github.marcodiri.java_socketio_chatroom_client.view.swing.components.MessageBoard;
 import io.github.marcodiri.java_socketio_chatroom_core.model.Message;
 import io.github.marcodiri.java_socketio_chatroom_server.ChatroomServer;
 import io.github.marcodiri.java_socketio_chatroom_server.model.ServerMessage;
 import io.github.marcodiri.java_socketio_chatroom_server.repository.ServerRepository;
-import io.github.marcodiri.java_socketio_chatroom_server.repository.mongo.ServerMongoRepository;
 import io.socket.client.IO;
 import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
@@ -16,35 +13,38 @@ import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JTextComponentFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.net.URI;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.concurrent.atomic.AtomicReference;
-
+import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ClientSwingViewIT extends AssertJSwingJUnitTestCase {
 	private FrameFixture window;
 
+	@Mock
 	private ServerRepository serverRepository;
-	private MongoClient mongoClient;
+	@InjectMocks
 	private ChatroomServer server;
+	private AutoCloseable closeable;
 
 	private ChatroomClient client;
 	private ClientSwingView clientView;
 
 	@Override
 	public void onSetUp() {
-		int mongoPort = Integer.parseInt(System.getProperty("mongo.port", "27017"));
-		mongoClient = new MongoClient(new ServerAddress("localhost", mongoPort));
-
-		serverRepository = new ServerMongoRepository(mongoClient);
-		server = new ChatroomServer(serverRepository);
+		closeable = MockitoAnnotations.openMocks(this);
 
 		try {
 			server.start();
@@ -65,9 +65,9 @@ public class ClientSwingViewIT extends AssertJSwingJUnitTestCase {
 
 	@Override
 	public void onTearDown() throws Exception {
+		client.disconnect();
 		server.stop();
-		mongoClient.getDatabase(ServerMongoRepository.CHATROOM_DB_NAME).drop();
-		mongoClient.close();
+		closeable.close();
 	}
 
 	@Test
@@ -80,8 +80,7 @@ public class ClientSwingViewIT extends AssertJSwingJUnitTestCase {
 		Timestamp timestamp2 = new Timestamp(1);
 		Message newerMessage = new ServerMessage(timestamp2, "user2", "message2");
 
-		serverRepository.save(olderMessage);
-		serverRepository.save(newerMessage);
+		when(serverRepository.findAll()).thenReturn(asList(olderMessage, newerMessage));
 
 		window.textBox("txtUsername").enterText("user3");
 		window.button(JButtonMatcher.withText("Connect")).click();
@@ -98,7 +97,9 @@ public class ClientSwingViewIT extends AssertJSwingJUnitTestCase {
 
 	@Test
 	public void testSentMessageIsSavedInDb() {
-		window.textBox("txtUsername").enterText("user");
+		String userTxt = "user";
+		String messageTxt = "Text";
+		window.textBox("txtUsername").enterText(userTxt);
 		window.button(JButtonMatcher.withText("Connect")).click();
 
 		JTextComponentFixture txtMessage = window.textBox("txtMessage");
@@ -107,19 +108,17 @@ public class ClientSwingViewIT extends AssertJSwingJUnitTestCase {
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
 			fail("Cannot connect to server");
 		}
-		txtMessage.enterText("Text");
+		txtMessage.enterText(messageTxt);
 		window.button(JButtonMatcher.withText("Send")).click();
 
-		AtomicReference<Message> retrievedMessage = new AtomicReference<>();
+		ArgumentCaptor<Message> retrievedMessage = ArgumentCaptor.forClass(Message.class);
 		try {
-			await().atMost(2, SECONDS).until(() -> {
-				retrievedMessage.set(serverRepository.findAll().get(0));
-				return retrievedMessage.get().getUser().equals("user") && retrievedMessage.get().getUserMessage().equals("Text");
-			});
-		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
-			fail("Expected: {user: user, message: Text} " +
-					"but got {user: " + retrievedMessage.get().getUser() + ", message: " + retrievedMessage.get().getUserMessage() + "}");
+			await().atMost(2, SECONDS).untilAsserted(() -> verify(serverRepository).save(retrievedMessage.capture()));
+		} catch (org.awaitility.core.ConditionTimeoutException e) {
+			fail(e.getMessage());
 		}
+		assertThat(retrievedMessage.getValue().getUser()).isEqualTo(userTxt);
+		assertThat(retrievedMessage.getValue().getUserMessage()).isEqualTo(messageTxt);
 	}
 
 	@Test
