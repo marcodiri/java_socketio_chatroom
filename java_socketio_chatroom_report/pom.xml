@@ -40,7 +40,6 @@
       <build>
         <plugins>
           <plugin>
-            <!-- main configuration in pluginManagement -->
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
             <executions>
