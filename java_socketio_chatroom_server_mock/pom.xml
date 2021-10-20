@@ -3,25 +3,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.github.marcodiri</groupId>
+  <parent>
+    <groupId>io.github.marcodiri</groupId>
+    <artifactId>java_socketio_chatroom_parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../java_socketio_chatroom_parent</relativePath>
+  </parent>
+
   <artifactId>java_socketio_chatroom_server_mock</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>java_socketio_chatroom_server_mock</name>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-
-    <junit.version>4.13.2</junit.version>
-    <assertj.version>3.20.2</assertj.version>
-    <log4j.version>2.14.1</log4j.version>
-    <awaitility.version>4.1.0</awaitility.version>
-    <jacoco.plugin.version>0.8.7</jacoco.plugin.version>
-    <pitest.plugin.version>1.6.8</pitest.plugin.version>
-    <json.version>20210307</json.version>
     <javax.version>4.0.1</javax.version>
     <jetty-server.version>9.4.43.v20210629</jetty-server.version>
     <jetty-servlet.version>9.4.43.v20210629</jetty-servlet.version>
@@ -33,15 +27,13 @@
     <sonar.junit.reportPaths>
       ${project.build.directory}/surefire-reports
     </sonar.junit.reportPaths>
-    <aggregate.report.dir>java_socketio_chatroom_report/target/site/jacoco-aggregate/jacoco.xml
-    </aggregate.report.dir>
-    <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
-    </sonar.coverage.jacoco.xmlReportPaths>
 
     <sonar.coverage.exclusions>
       **/ServerWrapper.*,
       **/ServerWrapper$*.*
     </sonar.coverage.exclusions>
+
+    <!-- Remove Sonar code duplication detection -->
     <sonar.cpd.exclusions>
       **/ServerWrapper.*
     </sonar.cpd.exclusions>
@@ -49,36 +41,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-core</artifactId>
-        <version>${assertj.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-bom</artifactId>
-        <version>${log4j.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>org.awaitility</groupId>
-        <artifactId>awaitility</artifactId>
-        <version>${awaitility.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>${json.version}</version>
-      </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
@@ -119,28 +81,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.awaitility</groupId>
-      <artifactId>awaitility</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -172,116 +114,10 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>3.1.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.2.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.8.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.22.2</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>integration-test</goal>
-                <goal>verify</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.2.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.9.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>3.1.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>${jacoco.plugin.version}</version>
-          <executions>
-            <execution>
-              <goals>
-                <!-- binds by default to the phase "initialize" -->
-                <goal>prepare-agent</goal>
-                <!-- binds by default to the phase "verify" -->
-                <goal>report</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>jacoco-check</id>
-              <goals>
-                <!-- binds by default to the phase "verify" -->
-                <goal>check</goal>
-              </goals>
-              <configuration>
-                <rules>
-                  <rule>
-                    <element>PACKAGE</element>
-                    <limits>
-                      <limit>
-                        <counter>LINE</counter>
-                        <value>COVEREDRATIO</value>
-                        <minimum>1</minimum>
-                      </limit>
-                    </limits>
-                  </rule>
-                </rules>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.pitest</groupId>
-          <artifactId>pitest-maven</artifactId>
-          <version>${pitest.plugin.version}</version>
-          <configuration>
-            <mutators>
-              <mutator>DEFAULTS</mutator>
-              <mutator>NON_VOID_METHOD_CALLS</mutator>
-            </mutators>
-            <mutationThreshold>100</mutationThreshold>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-
   <profiles>
     <profile>
       <id>jacoco</id>
       <activation>
-        <!-- Activated when the system property "skipCoverage" is not defined
-          at all or is defined with a value which is not "true", thus, implicitly active
-          by default -->
         <property>
           <name>skipCoverage</name>
           <value>!true</value>
@@ -290,7 +126,6 @@
       <build>
         <plugins>
           <plugin>
-            <!-- configured in pluginManagement -->
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
             <configuration>
@@ -308,7 +143,6 @@
       <build>
         <plugins>
           <plugin>
-            <!-- configured also in pluginManagement -->
             <groupId>org.pitest</groupId>
             <artifactId>pitest-maven</artifactId>
             <configuration>
