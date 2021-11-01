@@ -67,7 +67,7 @@ public class ChatroomServerMockTest {
 	@Test
 	public void testHandleConnectionsSavesTheConnectedClientSocket() {
 		clientSocket.connect();
-		waitClientConnected();
+		assertClientConnected();
 
 		assertThat(serverMock.getSocket().getId()).isEqualTo(clientSocket.id());
 	}
@@ -85,7 +85,7 @@ public class ChatroomServerMockTest {
 		serverMock.getHandlersToAttach().get(event).add(listener2);
 
 		clientSocket.connect();
-		waitClientConnected();
+		assertClientConnected();
 
 		assertThat(serverMock.getSocket().listeners(event)).containsExactly(listener1, listener2);
 		assertThat(serverMock.getHandlersToAttach()).isEmpty();
@@ -120,7 +120,7 @@ public class ChatroomServerMockTest {
 	@Test
 	public void testHandleEventWhenClientConnected() {
 		clientSocket.connect();
-		waitClientConnected();
+		assertClientConnected();
 
 		try {
 			serverMock.handleEvent("event", args -> {
@@ -147,7 +147,7 @@ public class ChatroomServerMockTest {
 		clientSocket.on("event", args -> eventReceived.set(true));
 
 		clientSocket.connect();
-		waitClientConnected();
+		assertClientConnected();
 
 		try {
 			serverMock.sendEvent("event", new JSONObject());
@@ -162,7 +162,7 @@ public class ChatroomServerMockTest {
 		}
 	}
 
-	private void waitClientConnected() {
+	private void assertClientConnected() {
 		try {
 			await().atMost(2, SECONDS).until(() -> clientSocket.connected());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {

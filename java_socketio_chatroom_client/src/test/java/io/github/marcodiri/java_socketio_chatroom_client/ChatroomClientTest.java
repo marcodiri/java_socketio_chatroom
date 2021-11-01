@@ -80,7 +80,7 @@ public class ChatroomClientTest {
 	@Test
 	public void testInitListenerCallsDisconnectedHandlerOnDisconnectEvent() {
 		client.getSocket().connect();
-		waitClientConnected();
+		assertClientConnected();
 
 		client.getSocket().disconnect();
 
@@ -96,7 +96,7 @@ public class ChatroomClientTest {
 	@Test
 	public void testConnectConnectsTheClientToServer() {
 		client.connect(USERNAME);
-		waitClientConnected();
+		assertClientConnected();
 	}
 
 	@Test
@@ -109,7 +109,7 @@ public class ChatroomClientTest {
 	@Test
 	public void testDisconnectDisconnectsTheClientFromServer() {
 		client.getSocket().connect();
-		waitClientConnected();
+		assertClientConnected();
 
 		client.disconnect();
 		try {
@@ -135,7 +135,7 @@ public class ChatroomClientTest {
 		serverMock.handleEvent("msg", arg -> receivedMsg.set((JSONObject) arg[0]));
 
 		client.getSocket().connect();
-		waitClientConnected();
+		assertClientConnected();
 		client.connected.set(true);
 
 		ClientMessage msg = new ClientMessage(new Timestamp(0), USERNAME, "message");
@@ -153,7 +153,7 @@ public class ChatroomClientTest {
 		}
 	}
 
-	private void waitClientConnected() {
+	private void assertClientConnected() {
 		try {
 			await().atMost(2, SECONDS).until(() -> client.getSocket().connected());
 		} catch (org.awaitility.core.ConditionTimeoutException ignored) {
