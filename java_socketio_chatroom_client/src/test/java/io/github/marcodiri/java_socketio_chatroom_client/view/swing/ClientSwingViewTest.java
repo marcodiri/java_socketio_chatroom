@@ -321,12 +321,12 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testTxtMessageShowsErrorWhenDisconnectedFromServer() throws SocketException {
+	public void testTxtMessageShowsErrorWhenClientThrows() throws SocketException {
 		JTextComponentFixture txtUsername = window.textBox("txtUsername");
 		JTextComponentFixture txtMessage = window.textBox("txtMessage");
 		JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
 
-		String error = "Unable to send message when not connected to server";
+		String error = "Error";
 		doThrow(new SocketException(error)).when(client).sendMessage(any(ClientMessage.class));
 
 		String username = "Username";
@@ -390,13 +390,13 @@ public class ClientSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testBtnSendShowsErrorWhenDisconnectedFromServer() throws SocketException {
+	public void testBtnSendShowsErrorWhenClientThrows() throws SocketException {
 		JTextComponentFixture txtUsername = window.textBox("txtUsername");
 		JTextComponentFixture txtMessage = window.textBox("txtMessage");
 		JTextComponentFixture txtErrorMessage = window.textBox("txtErrorMessage");
 		JButtonFixture btnSend = window.button(JButtonMatcher.withText("Send"));
 
-		String error = "Unable to send message when not connected to server";
+		String error = "Error";
 		doThrow(new SocketException(error)).when(client).sendMessage(any(ClientMessage.class));
 
 		String username = "Username";
