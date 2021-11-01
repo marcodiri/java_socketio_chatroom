@@ -70,7 +70,7 @@ public class ChatroomClientHandlersTest {
 	}
 	
 	@Test
-	public void testConnectedHandlerEmitsJoinEvent() {
+	public void testConnectedHandlerEmitsJoinEventWithCorrectUsername() {
 		client.username = "user";
 		AtomicBoolean joinReceived = new AtomicBoolean(false);
 		AtomicReference<String> usernameReceived = new AtomicReference<>();
