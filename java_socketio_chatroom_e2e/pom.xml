@@ -29,14 +29,17 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>java_socketio_chatroom_server</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>java_socketio_chatroom_client</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongo-java-driver</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
