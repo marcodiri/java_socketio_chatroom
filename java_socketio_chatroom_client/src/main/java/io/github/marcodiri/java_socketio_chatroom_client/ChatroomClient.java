@@ -79,12 +79,15 @@ public class ChatroomClient {
 			LOGGER.debug(() -> "Received {event: \"connected\"} from Server");
 			if (username != null) {
 				LOGGER.info("Socket successfully connected to Server");
+
 				socket.on("joined", arg -> handleJoin(((JSONObject) arg[0]).getString("roomName")));
+				socket.on("msg", arg -> handleMessage(new ClientMessage((JSONObject) arg[0])));
+				socket.on("error", arg -> handleError(((JSONObject) arg[0]).getString("message")));
+
 				socket.emit("join", username);
 				LOGGER.info("Socket attempting to join the room");
 				LOGGER.debug(() -> String.format("Sent {event: \"join\", message: \"%s\"} to Server", username));
-				socket.on("msg", arg -> handleMessage(new ClientMessage((JSONObject) arg[0])));
-				socket.on("error", arg -> handleError(((JSONObject) arg[0]).getString("message")));
+
 				connected.set(true);
 			} else {
 				throw new NullPointerException("Username is null");
